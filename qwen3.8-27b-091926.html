@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REALLMS — Research and Academic LLM Services | Indiana University</title>
+<meta name="description" content="REALLMS gives the IU community free, on-premises large language models via REALLMS Chat and the REALLMS API (OpenAI-compatible), hosted in the IU Data Center.">
+<!-- IU branding: Rivet Design System (official IU design system, rivet.iu.edu) -->
+<link rel="stylesheet" href="https://unpkg.com/rivet-core@2.9.1/css/rivet.min.css">
+<style>
+:root{
+  --iu-blue-600:#004F80;
+  --iu-blue-500:#006298;
+  --iu-blue-400:#328BB8;
+  --iu-blue-300:#63B1D3;
+  --iu-blue-200:#94D2E7;
+  --iu-crimson-400:#DC231E;
+  --iu-crimson-300:#F23A3F;
+  --iu-gold-400:#FFC132;
+  --iu-black-700:#0E1825;
+  --iu-black-600:#182534;
+  --iu-black-500:#243142;
+  --iu-black-400:#4C5A69;
+  --iu-black-300:#75838F;
+  --iu-black-200:#A0ABB4;
+  --iu-black-100:#E2E7E9;
+  --glass:rgba(24,37,52,.55);
+  --glass-brd:rgba(226,231,233,.14);
+  --glow-blue:0 0 40px rgba(0,98,152,.45);
+  --glow-crimson:0 0 40px rgba(220,35,30,.35);
+  --font-sans:'BentonSans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Open Sans','Helvetica Neue',sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  background:var(--iu-black-700);
+  color:var(--iu-black-100);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--iu-crimson-400);color:#fff}
+a{color:var(--iu-blue-200)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ---------- background aurora ---------- */
+.aurora{position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(60% 50% at 12% -5%, rgba(0,79,128,.55) 0%, transparent 60%),
+  radial-gradient(45% 40% at 88% 8%, rgba(220,35,30,.28) 0%, transparent 60%),
+  radial-gradient(50% 45% at 55% 110%, rgba(89,38,77,.4) 0%, transparent 60%),
+  var(--iu-black-700);}
+.grid-bg{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(rgba(226,231,233,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(226,231,233,.05) 1px,transparent 1px);
+  background-size:56px 56px;
+  -webkit-mask-image:radial-gradient(80% 60% at 50% 0%,#000 30%,transparent 90%);
+  mask-image:radial-gradient(80% 60% at 50% 0%,#000 30%,transparent 90%);}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:drift 18s ease-in-out infinite alternate}
+.orb-1{width:520px;height:520px;left:-140px;top:-120px;background:radial-gradient(circle,var(--iu-blue-500),transparent 70%)}
+.orb-2{width:460px;height:460px;right:-120px;top:60px;background:radial-gradient(circle,var(--iu-crimson-400),transparent 70%);animation-delay:-6s}
+.orb-3{width:560px;height:560px;left:35%;bottom:-260px;background:radial-gradient(circle,#59264D,transparent 70%);animation-delay:-12s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(60px,40px) scale(1.12)}}
+
+/* ---------- header (Rivet lockup + official IU trident) ---------- */
+.site-header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:rgba(14,24,37,.72);border-bottom:1px solid var(--glass-brd);}
+.site-header .rvt-header-global{background:transparent;border-bottom:none;padding:0}
+.site-header .rvt-container-xl{max-width:1180px}
+.rvt-lockup{display:flex;align-items:center;gap:14px;padding:14px 0;text-decoration:none}
+.rvt-lockup__tab{width:44px;height:44px;display:grid;place-items:center;border-radius:10px;
+  background:linear-gradient(135deg,var(--iu-blue-600),var(--iu-blue-500));
+  box-shadow:0 4px 18px rgba(0,79,128,.5);border:1px solid rgba(226,231,233,.2)}
+.rvt-lockup__trident{width:24px;height:auto;color:#fff}
+.rvt-lockup__title{display:block;font-size:1.35rem;font-weight:700;color:#fff;letter-spacing:.01em;line-height:1.1}
+.rvt-lockup__title .trident-red{color:var(--iu-crimson-300)}
+.rvt-lockup__subtitle{display:block;font-size:.78rem;color:var(--iu-black-200);letter-spacing:.08em;text-transform:uppercase}
+.main-nav{display:flex;gap:6px;margin-left:auto;align-items:center}
+.main-nav a{color:var(--iu-black-100);text-decoration:none;font-size:.92rem;padding:8px 14px;border-radius:999px;transition:.2s}
+.main-nav a:hover{background:rgba(226,231,233,.09);color:#fff}
+.nav-cta{background:linear-gradient(135deg,var(--iu-blue-500),var(--iu-blue-600))!important;color:#fff!important;font-weight:600;box-shadow:var(--glow-blue)}
+.nav-cta:hover{filter:brightness(1.15);background:linear-gradient(135deg,var(--iu-blue-500),var(--iu-blue-600))!important}
+@media(max-width:900px){.main-nav a:not(.nav-cta){display:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:90px 0 64px;text-align:center}
+.hero .orb{z-index:-1}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--iu-blue-200);border:1px solid var(--glass-brd);background:var(--glass);padding:8px 18px;border-radius:999px;backdrop-filter:blur(8px)}
+.hero-kicker .dot{width:8px;height:8px;border-radius:50%;background:var(--iu-gold-400);box-shadow:0 0 12px var(--iu-gold-400);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero h1{font-size:clamp(2.6rem,6.5vw,4.6rem);line-height:1.04;margin:28px 0 20px;font-weight:800;letter-spacing:-.02em;color:#fff}
+.grad-text{background:linear-gradient(92deg,#fff 5%,var(--iu-blue-200) 40%,var(--iu-blue-300) 60%,var(--iu-crimson-300) 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{max-width:760px;margin:0 auto;font-size:1.18rem;line-height:1.65;color:var(--iu-black-200)}
+.hero-sub strong{color:#fff;font-weight:600}
+.hero-ctas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:38px 0 14px}
+.btn{display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:1.02rem;padding:15px 30px;border-radius:14px;
+  text-decoration:none;transition:.25s;border:1px solid transparent;cursor:pointer}
+.btn svg{flex:none}
+.btn-primary{background:linear-gradient(135deg,var(--iu-crimson-400),#B11C00);color:#fff;box-shadow:var(--glow-crimson)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(220,35,30,.55)}
+.btn-ghost{background:var(--glass);border-color:var(--glass-brd);color:#fff;backdrop-filter:blur(8px)}
+.btn-ghost:hover{transform:translateY(-2px);border-color:var(--iu-blue-300);box-shadow:var(--glow-blue)}
+.hero-badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:22px}
+.hbadge{font-size:.8rem;font-weight:500;color:var(--iu-black-100);border:1px solid var(--glass-brd);background:rgba(24,37,52,.5);
+  padding:7px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;backdrop-filter:blur(6px)}
+.hbadge svg{width:14px;height:14px;color:var(--iu-gold-400);flex:none}
+
+/* architecture strip */
+.arch{margin:54px auto 0;max-width:860px;display:grid;grid-template-columns:1fr 1fr;gap:18px;text-align:left}
+.arch-card{border:1px solid var(--glass-brd);background:var(--glass);border-radius:18px;padding:20px 22px;backdrop-filter:blur(10px);transition:.3s}
+.arch-card:hover{transform:translateY(-3px);box-shadow:var(--glow-blue)}
+.arch-card h3{margin:0 0 4px;font-size:.95rem;color:#fff;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.arch-card h3 .chip{font-size:.68rem;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:999px;background:rgba(99,177,211,.16);color:var(--iu-blue-200);border:1px solid rgba(99,177,211,.35)}
+.arch-card p{margin:0 0 14px;font-size:.85rem;color:var(--iu-black-200)}
+.pipes{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pipe{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;background:var(--iu-black-700);border:1px solid var(--glass-brd);
+  color:var(--iu-blue-200);padding:7px 12px;border-radius:9px}
+.pipe-arr{color:var(--iu-black-300);font-size:.9rem}
+.arch-foot{grid-column:1/-1;text-align:center;font-size:.8rem;color:var(--iu-black-300);margin-top:4px}
+.arch-foot b{color:var(--iu-gold-400);font-weight:600}
+@media(max-width:720px){.arch{grid-template-columns:1fr}}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
+.stat{border:1px solid var(--glass-brd);background:var(--glass);border-radius:16px;padding:20px;backdrop-filter:blur(10px);text-align:center;transition:.3s}
+.stat:hover{transform:translateY(-3px);box-shadow:var(--glow-blue)}
+.stat .num{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#fff,var(--iu-blue-200));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .lbl{font-size:.8rem;color:var(--iu-black-200);margin-top:4px}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- model ticker ---------- */
+.ticker{border-block:1px solid var(--glass-brd);background:rgba(14,24,37,.6);overflow:hidden;padding:14px 0;margin-top:56px;backdrop-filter:blur(6px)}
+.ticker-track{display:flex;gap:44px;width:max-content;animation:scrollx 36s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-track span{display:inline-flex;align-items:center;gap:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85rem;color:var(--iu-black-200);white-space:nowrap}
+.ticker-track .tk-dot{width:7px;height:7px;border-radius:50%;flex:none}
+@keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- sections ---------- */
+section{padding:96px 0}
+.sec-head{text-align:center;max-width:720px;margin:0 auto 60px}
+.eyebrow{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--iu-crimson-300);margin-bottom:14px}
+.eyebrow.blue{color:var(--iu-blue-200)}
+.sec-head h2{font-size:clamp(1.9rem,4vw,2.8rem);font-weight:800;letter-spacing:-.01em;margin:0 0 16px;color:#fff;line-height:1.12}
+.sec-head p{color:var(--iu-black-200);font-size:1.08rem;line-height:1.65;margin:0}
+.sec-head p a{color:var(--iu-blue-200)}
+
+/* ---------- component cards ---------- */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:900px){.comp-grid{grid-template-columns:1fr}}
+.comp{position:relative;border-radius:24px;padding:36px;border:1px solid var(--glass-brd);background:var(--glass);backdrop-filter:blur(14px);overflow:hidden;transition:.35s;display:flex;flex-direction:column}
+.comp::before{content:"";position:absolute;inset:0;background:radial-gradient(80% 50% at 50% 0%,var(--tint,rgba(0,98,152,.22)),transparent 70%);opacity:0;transition:.35s;pointer-events:none}
+.comp:hover{transform:translateY(-6px)}
+.comp:hover::before{opacity:1}
+.comp-chat{--tint:rgba(0,98,152,.3);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.comp-chat:hover{box-shadow:var(--glow-blue),0 20px 60px rgba(0,0,0,.35);border-color:rgba(99,177,211,.4)}
+.comp-api{--tint:rgba(220,35,30,.22)}
+.comp-api:hover{box-shadow:var(--glow-crimson),0 20px 60px rgba(0,0,0,.35);border-color:rgba(242,58,63,.4)}
+.comp-icon{width:60px;height:60px;border-radius:16px;display:grid;place-items:center;margin-bottom:22px;border:1px solid var(--glass-brd)}
+.comp-icon svg{width:30px;height:30px}
+.comp-chat .comp-icon{background:linear-gradient(135deg,rgba(0,98,152,.5),rgba(0,79,128,.25));color:var(--iu-blue-200)}
+.comp-api .comp-icon{background:linear-gradient(135deg,rgba(220,35,30,.45),rgba(177,28,0,.2));color:var(--iu-crimson-300)}
+.comp h3{font-size:1.55rem;margin:0 0 6px;color:#fff;font-weight:700}
+.comp .url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85rem;color:var(--iu-gold-400);margin-bottom:14px;display:block}
+.comp>p{color:var(--iu-black-200);line-height:1.6;font-size:.97rem;margin:0 0 20px}
+.comp>p strong{color:#fff}
+.comp ul{list-style:none;padding:0;margin:0 0 26px;display:grid;gap:10px}
+.comp li{display:flex;gap:10px;font-size:.92rem;color:var(--iu-black-100);line-height:1.5}
+.comp li strong{color:#fff}
+.comp li code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em;background:rgba(226,231,233,.09);padding:1px 6px;border-radius:5px;color:var(--iu-blue-200)}
+.comp li svg{width:17px;height:17px;flex:none;margin-top:2px}
+.comp-chat li svg{color:var(--iu-blue-300)}
+.comp-api li svg{color:var(--iu-crimson-300)}
+.comp-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:auto}
+.btn-sm{padding:11px 20px;font-size:.9rem;border-radius:11px}
+.tag{display:inline-flex;align-items:center;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:999px;white-space:nowrap}
+.tag-gold{background:rgba(255,193,50,.14);color:var(--iu-gold-400);border:1px solid rgba(255,193,50,.4)}
+.tag-green{background:rgba(50,147,69,.14);color:#63B363;border:1px solid rgba(50,147,69,.4)}
+.comp-top{display:flex;align-items:flex-start;gap:16px}
+.comp-top>div:first-child{flex:1}
+
+/* ---------- allocation flow ---------- */
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;align-items:stretch;position:relative}
+.flow::before{content:"";position:absolute;top:34px;left:8%;right:8%;height:2px;background:linear-gradient(90deg,var(--iu-blue-500),var(--iu-crimson-400));opacity:.55}
+.flow-step{position:relative;padding:0 14px;text-align:center}
+.flow-node{width:68px;height:68px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;position:relative;z-index:1;
+  background:var(--iu-black-600);border:2px solid var(--iu-blue-400);box-shadow:0 0 0 6px rgba(14,24,37,.9),0 0 26px rgba(0,98,152,.5);transition:.3s}
+.flow-step:nth-child(4) .flow-node{border-color:var(--iu-crimson-400);box-shadow:0 0 0 6px rgba(14,24,37,.9),0 0 26px rgba(220,35,30,.45)}
+.flow-step:hover .flow-node{transform:scale(1.08)}
+.flow-node svg{width:28px;height:28px;color:var(--iu-blue-200)}
+.flow-step:nth-child(4) .flow-node svg{color:var(--iu-crimson-300)}
+.flow-num{position:absolute;top:-6px;right:-2px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--iu-crimson-400),#B11C00);
+  color:#fff;font-size:.75rem;font-weight:800;display:grid;place-items:center;border:2px solid var(--iu-black-700);z-index:2}
+.flow-card{border:1px solid var(--glass-brd);background:var(--glass);border-radius:16px;padding:18px 16px;backdrop-filter:blur(10px);height:100%;transition:.3s}
+.flow-step:hover .flow-card{border-color:var(--iu-blue-300);transform:translateY(-4px)}
+.flow-card h4{margin:0 0 6px;font-size:.98rem;color:#fff}
+.flow-card p{margin:0 0 10px;font-size:.82rem;color:var(--iu-black-200);line-height:1.5}
+.flow-card a{font-size:.8rem;font-weight:600;color:var(--iu-blue-200);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.flow-card a:hover{text-decoration:underline}
+.flow-card a svg{width:13px;height:13px}
+@media(max-width:900px){
+  .flow{grid-template-columns:1fr;gap:26px}
+  .flow::before{display:none}
+  .flow-step{display:grid;grid-template-columns:68px 1fr;gap:16px;text-align:left;align-items:start}
+  .flow-node{margin:0}
+}
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"></div>
+<div class="grid-bg" aria-hidden="true"></div>
+
+<header class="site-header rvt-header-wrapper">
+  <a class="rvt-header-wrapper__skip-link" href="#main-content">Skip to main content</a>
+  <div class="rvt-header-global">
+    <div class="rvt-container-xl rvt-p-lr-md">
+      <a class="rvt-lockup" href="#top" aria-label="REALLMS, Indiana University — home">
+        <div class="rvt-lockup__tab">
+          <svg xmlns="http://www.w3.org/2000/svg" class="rvt-lockup__trident" viewBox="0 0 28 34" role="img" aria-label="IU trident">
+            <path d="M-3.34344e-05 4.70897H8.83308V7.174H7.1897V21.1426H10.6134V2.72321H8.83308V0.121224H18.214V2.65476H16.2283V21.1426H19.7889V7.174H18.214V4.64047H27.0471V7.174H25.0614V23.6761L21.7746 26.8944H16.2967V30.455H18.214V33.8787H8.76463V30.592H10.6819V26.8259H5.20403L1.91726 23.6077V7.174H-3.34344e-05V4.70897Z" fill="currentColor"></path>
+          </svg>
+        </div>
+        <div class="rvt-lockup__body">
+          <span class="rvt-lockup__title">REAL<span class="trident-red">LMS</span></span>
+          <span class="rvt-lockup__subtitle">Indiana University</span>
+        </div>
+      </a>
+      <nav class="main-nav" aria-label="Primary">
+        <a href="#components">Components</a>
+        <a href="#api-key">Get an API key</a>
+        <a href="#models">Models</a>
+        <a href="#setup">Setup guides</a>
+        <a href="#help">Help</a>
+        <a class="nav-cta" href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">Open Chat →</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main id="main-content">
+<section class="hero" id="top">
+  <div class="orb orb-1" aria-hidden="true"></div>
+  <div class="orb orb-2" aria-hidden="true"></div>
+  <div class="wrap">
+    <span class="hero-kicker reveal"><span class="dot"></span> IU's on-premises AI research service</span>
+    <h1 class="reveal reveal-d1">Free large language models<br>for <span class="grad-text">Indiana University</span></h1>
+    <p class="hero-sub reveal reveal-d2">
+      <strong>REALLMS</strong> — Research and Academic LLM Services — gives the IU community LLM-powered tools
+      at <strong>no fee</strong>, with all hardware on premises in the <strong>IU Data Center</strong>.
+      Chat interactively, or plug the models straight into your own research workflows through an
+      OpenAI-compatible API.
+    </p>
+    <div class="hero-ctas reveal reveal-d3">
+      <a class="btn btn-primary" href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3.2a1.8 1.8 0 0 1 1.8-1.8h10.4A1.8 1.8 0 0 1 15 3.2v6.6a1.8 1.8 0 0 1-1.8 1.8H6.3L2.6 13.6A.8.8 0 0 1 1 13V3.2Z"/></svg>
+        Launch REALLMS Chat
+      </a>
+      <a class="btn btn-ghost" href="#api-key">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M6.28 1.506A4.5 4.5 0 0 1 10.4 1.56a2.5 2.5 0 0 0 2.828 2.828A4.5 4.5 0 1 1 8.031 8.28L2.01 14.3a.75.75 0 0 1-1.06-1.06L7.97 7.22a4.5 4.5 0 0 1-1.69-5.714Z"/></svg>
+        Get API access
+      </a>
+    </div>
+    <div class="hero-badges reveal reveal-d4">
+      <span class="hbadge"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg> No fee for the IU community</span>
+      <span class="hbadge"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 1a1 1 0 0 0-1 1v3.13a2 2 0 0 0-1.5 1.923v5.914A2.5 2.5 0 0 0 2 15.5h12a2.5 2.5 0 0 0 2.5-2.5V8.053A2 2 0 0 0 15 6.13V2a1 1 0 0 0-1-1H2Z"/></svg> 100% on-prem · IU Data Center</span>
+      <span class="hbadge"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a6.5 6.5 0 1 0 0 13A6.5 6.5 0 0 0 8 1Zm2.1 3.4-1 4.1h-2.2l-1-4.1h4.2ZM4 12h8v1H4v-1Z"/></svg> Approved for Critical research data &amp; PHI</span>
+      <span class="hbadge"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M5.83 2.17a.75.75 0 0 1 1.06 0l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06L10.19 8 5.83 3.67a.75.75 0 0 1 0-1.06Z"/></svg> OpenAI-compatible API (beta)</span>
+    </div>
+
+    <div class="arch reveal reveal-d4">
+      <div class="arch-card">
+        <h3>REALLMS Chat <span class="chip">Web app</span></h3>
+        <p>A conversational LLM workbench — pick a model, upload documents, generate images.</p>
+        <div class="pipes"><span class="pipe">Open WebUI</span><span class="pipe-arr">→</span><span class="pipe">vLLM</span><span class="pipe-arr">→</span><span class="pipe">IU Data Center</span></div>
+      </div>
+      <div class="arch-card">
+        <h3>REALLMS API <span class="chip">OpenAI-compatible</span></h3>
+        <p>Integrate LLMs into your own code, IDEs, agents, and services.</p>
+        <div class="pipes"><span class="pipe">LiteLLM routing</span><span class="pipe-arr">→</span><span class="pipe">vLLM serving</span><span class="pipe-arr">→</span><span class="pipe">IU Data Center</span></div>
+      </div>
+      <div class="arch-foot">One infrastructure, two doorways — both <b>free</b> and both <b>on premises</b>.</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat reveal"><div class="num">$0</div><div class="lbl">Cost to the IU community</div></div>
+      <div class="stat reveal reveal-d1"><div class="num">100%</div><div class="lbl">On-prem · IU Data Center</div></div>
+      <div class="stat reveal reveal-d2"><div class="num">24×7</div><div class="lbl">Available (scheduled maintenance only)</div></div>
+      <div class="stat reveal reveal-d3"><div class="num">7</div><div class="lbl">Models served across chat &amp; API</div></div>
+    </div>
+  </div>
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="ticker"></div>
+  </div>
+</section>
+
+<!-- ============ TWO COMPONENTS ============ -->
+<section id="components">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Two ways in</span>
+      <h2>The two core components of REALLMS</h2>
+      <p>Same models, same on-prem GPUs — pick the doorway that fits your work: a ready-made chat interface, or direct API access to build on.</p>
+    </div>
+    <div class="comp-grid">
+      <article class="comp comp-chat reveal">
+        <div class="comp-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3.2a1.8 1.8 0 0 1 1.8-1.8h10.4A1.8 1.8 0 0 1 15 3.2v6.6a1.8 1.8 0 0 1-1.8 1.8H6.3L2.6 13.6A.8.8 0 0 1 1 13V3.2Zm3.5 3.3a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8Zm3.5 0a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8Zm3.5 0a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8Z"/></svg>
+        </div>
+        <div class="comp-top">
+          <div>
+            <h3>REALLMS Chat</h3>
+            <span class="url">reallms.rescloud.iu.edu</span>
+          </div>
+          <span class="tag tag-green">Any IU account</span>
+        </div>
+        <p>An LLM-powered chat service built on the <strong>Open WebUI</strong> platform with a <strong>vLLM</strong> back end. Anyone with an IU account can sign in and start — no separate account, no setup.</p>
+        <ul>
+          <li><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg><span>Choose among <strong>4 chat models</strong> — including 256K-context options</span></li>
+          <li><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg><span>Save multiple chats, upload documents for context, and generate images</span></li>
+          <li><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg><span><strong>Folder support</strong> — drop documents, collections, and a custom prompt into a folder; every chat inside inherits them</span></li>
+          <li><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg><span><strong>Knowledge collections</strong> shared with groups, plus Google Drive &amp; OneDrive as sources (contact the RADL team to get set up)</span></li>
+        </ul>
+        <div class="comp-actions">
+          <a class="btn btn-primary btn-sm" href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">Open REALLMS Chat →</a>
+          <a class="btn btn-ghost btn-sm" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener">IU KB overview</a>
+        </div>
+      </article>
+
+      <article class="comp comp-api reveal reveal-d1">
+        <div class="comp-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.83 2.17a.75.75 0 0 1 1.06 0l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06L10.19 8 5.83 3.67a.75.75 0 0 1 0-1.06Zm-4 0a.75.75 0 0 1 1.06 0L8 8l-5.11 5.11a.75.75 0 1 1-1.06-1.06L6.94 8 2.58 3.67a.75.75 0 0 1 0-1.06Z"/></svg>
+        </div>
+        <div class="comp-top">
+          <div>
+            <h3>REALLMS API</h3>
+            <span class="url">reallms.rescloud.iu.edu/direct/v1</span>
+          </div>
+          <span class="tag tag-gold">Beta</span>
+        </div>
+        <p>For IU researchers, faculty, and staff to integrate large language models into their own workflows and services — at no cost. Uses <strong>LiteLLM</strong> for request routing and a <strong>vLLM</strong> back end for serving and managing models.</p>
+        <ul>
+          <li><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg><span>OpenAI-compatible endpoints: <code>/models</code>, <code>/chat/completions</code>, <code>/completions</code>, <code>/embeddings</code>, <code>/rerank</code></span></li>
+          <li><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg><span>Access is granted through an <strong>RT Project</strong> allocation via <a href="https://projects.rt.iu.edu" target="_blank" rel="noopener">projects.rt.iu.edu</a></span></li>
+          <li><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg><span>Your key is personal — invite teammates to your project, and each creates their own key</span></li>
+          <li><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.488 1.633a.5.5 0 0 1 .426.923L2.39 13.48a.5.5 0 0 1-.77-.64l11.466-11.2a.5.5 0 0 1 .402-.007Z"/></svg><span>Approved for <strong>Critical research data and PHI</strong>; data sent to the API is not stored</span></li>
+        </ul>
+        <div class="comp-actions">
+          <a class="btn btn-primary btn-sm" href="#api-key">Get an API key ↓</a>
+          <a class="btn btn-ghost btn-sm" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">API documentation</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ API KEY ALLOCATION FLOW ============ -->
+<section id="api-key" style="background:rgba(24,37,52,.35);border-block:1px solid var(--glass-brd)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">RT Projects → API key</span>
+      <h2>How you get REALLMS API access</h2>
+      <p>API access is managed through <a href="https://projects.rt.iu.edu" target="_blank" rel="noopener"><strong>RT Projects</strong></a>, IU's system for requesting specialized Research Technologies resources. See
+      <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" target="_blank" rel="noopener">Use RT Projects to request and manage access</a>
+      and the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">REALLMS API documentation</a> for full details.</p>
+    </div>
+    <div class="flow reveal">
+      <div class="flow-step">
+        <div class="flow-node">
+          <span class="flow-num">1</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1h-11Zm1 2.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-3Zm0 5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-3Zm5 0a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5v-3Z"/></svg>
+        </div>
+        <div class="flow-card">
+          <h4>Create an RT Project</h4>
+          <p>Sign in to RT Projects and create a project for your research group.</p>
+          <a href="https://projects.rt.iu.edu" target="_blank" rel="noopener">projects.rt.iu.edu <svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg></a>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-node">
+          <span class="flow-num">2</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M6.28 1.506A4.5 4.5 0 0 1 10.4 1.56a2.5 2.5 0 0 0 2.828 2.828A4.5 4.5 0 1 1 8.031 8.28L2.01 14.3a.75.75 0 0 1-1.06-1.06L7.97 7.22a4.5 4.5 0 0 1-1.69-5.714Z"/></svg>
+        </div>
+        <div class="flow-card">
+          <h4>Request a REALLMS API allocation</h4>
+          <p>On your project, request a REALLMS API allocation as an available resource.</p>
+          <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" target="_blank" rel="noopener">RT Projects guide <svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg></a>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-node">
+          <span class="flow-num">3</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14Zm0-1a6 6 0 1 0 0-12 6 6 0 0 0 0 12ZM8 4a.75.75 0 0 1 .75.75v3.5l2.5 1.5a.75.75 0 1 1-.75 1.3l-2.875-1.725A.75.75 0 0 1 7.25 8.25v-3.5A.75.75 0 0 1 8 4Z"/></svg>
+        </div>
+        <div class="flow-card">
+          <h4>Allocation approved</h4>
+          <p>UITS reviews your request. Once approved, the allocation appears on your project page.</p>
+          <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">API docs <svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg></a>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-node">
+          <span class="flow-num">4</span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2a2 2 0 0 1 2-2h12v4H2V2Zm0 6a2 2 0 0 1 2-2h12v4H2V8Zm0 6a2 2 0 0 1 2-2h12v4H2v-4Zm2.5-10a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
+        </div>
+        <div class="flow-card">
+          <h4>Create your API key</h4>
+          <p>Visit your allocation's page and create a key. Add teammates to the project, and each creates their own key.</p>
+          <a href="#setup">Set up your tools ↓ <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 12.5a.5.5 0 0 1-.354-.146l-4.5-4.5a.5.5 0 0 1 .708-.708L7.5 11.293V1.5a.5.5 0 0 1 1 0v9.793l3.646-3.647a.5.5 0 0 1 .708.708l-4.5 4.5A.5.5 0 0 1 8 12.5Z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+/* ---------- code blocks ---------- */
+.codeblock{position:relative;background:#0A121C;border:1px solid var(--glass-brd);border-radius:16px;overflow:hidden;margin:0}
+.codeblock .cb-head{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(226,231,233,.05);border-bottom:1px solid var(--glass-brd)}
+.cb-dot{width:11px;height:11px;border-radius:50%;flex:none}
+.cb-title{margin-left:8px;font-size:.78rem;color:var(--iu-black-300);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.copy-btn{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:rgba(226,231,233,.08);border:1px solid var(--glass-brd);
+  color:var(--iu-black-200);font-size:.75rem;padding:5px 12px;border-radius:8px;cursor:pointer;transition:.2s;font-family:var(--font-sans)}
+.copy-btn:hover{background:rgba(99,177,211,.18);color:#fff}
+.copy-btn svg{width:13px;height:13px}
+.codeblock pre{margin:0;padding:18px 20px;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.83rem;line-height:1.7;color:#C9D6E3}
+.codeblock .c{color:#5A6B7E}
+.codeblock .s{color:var(--iu-gold-400)}
+.codeblock .k{color:var(--iu-blue-200)}
+.base-url{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(0,79,128,.35),rgba(220,35,30,.18));
+  border:1px solid rgba(99,177,211,.35);border-radius:16px;padding:18px 22px;margin-bottom:26px}
+.base-url code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.95rem;color:#fff;font-weight:600}
+.base-url .lbl{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--iu-blue-200);font-weight:700}
+.base-url .copy-btn{margin-left:0}
+
+/* endpoints */
+.endpoints{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:4px}
+.ep{border:1px solid var(--glass-brd);background:var(--glass);border-radius:14px;padding:16px;backdrop-filter:blur(8px);transition:.25s}
+.ep:hover{transform:translateY(-3px);border-color:var(--iu-blue-300);box-shadow:var(--glow-blue)}
+.ep .m{font-size:.72rem;font-weight:800;letter-spacing:.08em;padding:3px 10px;border-radius:6px;display:inline-block;margin-bottom:10px}
+.ep-get .m{background:rgba(50,147,69,.18);color:#63B363;border:1px solid rgba(50,147,69,.4)}
+.ep-post .m{background:rgba(0,98,152,.25);color:var(--iu-blue-200);border:1px solid rgba(99,177,211,.4)}
+.ep code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85rem;color:#fff;word-break:break-all}
+.ep p{margin:8px 0 0;font-size:.78rem;color:var(--iu-black-200);line-height:1.5}
+
+/* ---------- models ---------- */
+.model-groups{display:grid;gap:34px}
+.mg-label{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.mg-label .chip{font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;border-radius:999px}
+.chip-blue{background:rgba(0,98,152,.3);color:var(--iu-blue-200);border:1px solid rgba(99,177,211,.4)}
+.chip-crimson{background:rgba(220,35,30,.22);color:var(--iu-crimson-300);border:1px solid rgba(242,58,63,.4)}
+.chip-gold{background:rgba(255,193,50,.12);color:var(--iu-gold-400);border:1px solid rgba(255,193,50,.4)}
+.mg-label .line{flex:1;height:1px;background:var(--glass-brd)}
+.model-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.model{position:relative;border:1px solid var(--glass-brd);background:var(--glass);border-radius:18px;padding:22px;backdrop-filter:blur(10px);
+  overflow:hidden;transition:.3s}
+.model::after{content:"";position:absolute;top:-40%;right:-40%;width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,var(--mt,rgba(99,177,211,.16)),transparent 70%);transition:.3s;pointer-events:none}
+.model:hover{transform:translateY(-5px);border-color:var(--mb,rgba(99,177,211,.5));box-shadow:var(--glow-blue)}
+.model .mn{font-size:1.15rem;font-weight:700;color:#fff;margin-bottom:2px}
+.model .mid{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.75rem;color:var(--iu-black-300);display:block;margin-bottom:16px;word-break:break-all}
+.mbadges{display:flex;gap:8px;flex-wrap:wrap}
+.mbadge{font-size:.72rem;font-weight:600;padding:4px 11px;border-radius:999px;background:rgba(226,231,233,.07);border:1px solid var(--glass-brd);color:var(--iu-black-100)}
+.mbadge.hl{background:rgba(0,98,152,.28);border-color:rgba(99,177,211,.45);color:var(--iu-blue-200)}
+.model-note{font-size:.85rem;color:var(--iu-black-300);margin-top:22px;display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.model-note svg{width:17px;height:17px;flex:none;color:var(--iu-gold-400);margin-top:1px}
+.model-note a{color:var(--iu-blue-200)}
+
+/* ---------- use cases ---------- */
+.uc-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:70px}
+@media(max-width:900px){.uc-grid{grid-template-columns:1fr}}
+.uc{border:1px solid var(--glass-brd);background:var(--glass);border-radius:22px;padding:30px;backdrop-filter:blur(12px);transition:.3s}
+.uc:hover{transform:translateY(-4px);box-shadow:var(--glow-blue)}
+.uc h3{display:flex;align-items:center;gap:12px;font-size:1.25rem;color:#fff;margin:0 0 18px}
+.uc h3 .uic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none}
+.uc h3 .uic svg{width:22px;height:22px}
+.uc-chat h3 .uic{background:rgba(0,98,152,.3);color:var(--iu-blue-200);border:1px solid rgba(99,177,211,.4)}
+.uc-api h3 .uic{background:rgba(220,35,30,.22);color:var(--iu-crimson-300);border:1px solid rgba(242,58,63,.4)}
+.uc-list{display:grid;gap:14px}
+.uc-item{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start}
+.uc-item .ui{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:rgba(226,231,233,.06);border:1px solid var(--glass-brd);color:var(--iu-blue-200)}
+.uc-item .ui svg{width:19px;height:19px}
+.uc-item h4{margin:0 0 3px;font-size:.95rem;color:#fff}
+.uc-item p{margin:0;font-size:.85rem;color:var(--iu-black-200);line-height:1.55}
+.uc-item p code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;background:rgba(226,231,233,.09);padding:1px 6px;border-radius:5px;color:var(--iu-blue-200)}
+
+/* integrations */
+.integ-head{display:flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:30px;text-align:center}
+.integ-head h3{font-size:1.5rem;color:#fff;margin:0}
+.integ-head span{color:var(--iu-black-300);font-size:.95rem}
+.integ-head code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(226,231,233,.09);padding:2px 8px;border-radius:6px;color:var(--iu-blue-200);font-size:.88em}
+.integ-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:900px){.integ-grid{grid-template-columns:1fr}}
+.integ{border:1px solid var(--glass-brd);background:rgba(14,24,37,.7);border-radius:20px;overflow:hidden;backdrop-filter:blur(10px);display:flex;flex-direction:column;transition:.3s}
+.integ:hover{transform:translateY(-4px);box-shadow:var(--glow-blue);border-color:rgba(99,177,211,.4)}
+.integ-head-row{display:flex;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid var(--glass-brd);background:rgba(226,231,233,.03)}
+.integ-logo{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;flex:none;border:1px solid var(--glass-brd)}
+.integ-logo svg{width:24px;height:24px}
+.integ-codex .integ-logo{background:linear-gradient(135deg,#0E1825,#243142);color:var(--iu-blue-200)}
+.integ-opencode .integ-logo{background:linear-gradient(135deg,#243142,#0E1825);color:var(--iu-gold-400)}
+.integ-head-row h4{margin:0;font-size:1.08rem;color:#fff}
+.integ-head-row p{margin:2px 0 0;font-size:.8rem;color:var(--iu-black-300)}
+.integ .steps{padding:18px 24px 6px;font-size:.86rem;color:var(--iu-black-200);line-height:1.6}
+.integ .steps b{color:#fff}
+.integ .steps code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:rgba(226,231,233,.09);padding:1px 6px;border-radius:5px;color:var(--iu-blue-200)}
+.integ .codeblock{margin:12px 20px 20px;flex:1}
+.integ-generic{background:rgba(14,24,37,.5)}
+.integ-generic .integ-logo{background:rgba(99,177,211,.15);color:var(--iu-blue-200);border:1px solid rgba(99,177,211,.4)}
+
+/* ---------- good to know ---------- */
+.gtk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.gtk-grid{grid-template-columns:1fr}}
+.gtk{border:1px solid var(--glass-brd);background:var(--glass);border-radius:16px;padding:24px;backdrop-filter:blur(8px);transition:.3s}
+.gtk:hover{transform:translateY(-3px);border-color:rgba(255,193,50,.5);box-shadow:0 0 30px rgba(255,193,50,.18)}
+.gtk .gi{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;margin-bottom:16px;
+  background:rgba(255,193,50,.1);color:var(--iu-gold-400);border:1px solid rgba(255,193,50,.35)}
+.gtk .gi svg{width:22px;height:22px}
+.gtk h4{margin:0 0 8px;color:#fff;font-size:1.02rem}
+.gtk p{margin:0;font-size:.87rem;color:var(--iu-black-200);line-height:1.6}
+.gtk p a{color:var(--iu-blue-200)}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--glass-brd);background:rgba(10,18,28,.8);backdrop-filter:blur(10px);padding:70px 0 36px;margin-top:40px}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:44px;margin-bottom:50px}
+@media(max-width:840px){.foot-grid{grid-template-columns:1fr}}
+.foot-brand .rvt-lockup{padding:0}
+.foot-brand .rvt-lockup__tab{width:40px;height:40px}
+.foot-brand p{color:var(--iu-black-300);font-size:.9rem;line-height:1.65;margin:16px 0 0;max-width:380px}
+.foot h5{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--iu-black-300);margin:0 0 16px}
+.foot ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.foot ul a{color:var(--iu-black-100);text-decoration:none;font-size:.92rem;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+.foot ul a:hover{color:var(--iu-blue-200);transform:translateX(3px)}
+.foot ul a svg{width:14px;height:14px;color:var(--iu-blue-300);flex:none}
+.foot-bottom{border-top:1px solid var(--glass-brd);padding-top:26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.foot-bottom p{margin:0;font-size:.8rem;color:var(--iu-black-300)}
+
+/* reveal animations */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal-d1{transition-delay:.1s}
+.reveal-d2{transition-delay:.2s}
+.reveal-d3{transition-delay:.3s}
+.reveal-d4{transition-delay:.4s}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .ticker-track,.orb,.hero-kicker .dot{animation:none}
+  html{scroll-behavior:auto}
+}
+</style>
+
+<!-- ============ API ENDPOINTS ============ -->
+<section id="api">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow blue">OpenAI-compatible</span>
+      <h2>One base URL, five endpoints</h2>
+      <p>Point any OpenAI-compatible client at the base URL, set your key as a bearer token, and go. Full details live in the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">REALLMS API documentation</a>.</p>
+    </div>
+    <div class="base-url reveal">
+      <span class="lbl">Base URL</span>
+      <code>https://reallms.rescloud.iu.edu/direct/v1</code>
+      <button class="copy-btn" data-copy="https://reallms.rescloud.iu.edu/direct/v1" aria-label="Copy base URL">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M11 0H0v11h3V9H2V2h7v1h2V0Z"/><path d="M16 5H5v11h11V5Zm-9 9V7h7v7H7Z"/></svg> Copy
+      </button>
+    </div>
+    <div class="endpoints">
+      <div class="ep ep-get reveal"><span class="m">GET</span><code>/models</code><p>List every model currently available on the service.</p></div>
+      <div class="ep ep-post reveal reveal-d1"><span class="m">POST</span><code>/chat/completions</code><p>Chat with all four general-purpose models.</p></div>
+      <div class="ep ep-post reveal reveal-d2"><span class="m">POST</span><code>/completions</code><p>Raw completions across the same four models.</p></div>
+      <div class="ep ep-post reveal reveal-d3"><span class="m">POST</span><code>/embeddings</code><p>Vectors via Qwen3-Embedding-8B or embeddinggemma-300m.</p></div>
+      <div class="ep ep-post reveal reveal-d4"><span class="m">POST</span><code>/rerank</code><p>Passage re-ranking with Qwen3-Reranker-8B.</p></div>
+    </div>
+    <div class="codeblock reveal" style="margin-top:26px">
+      <div class="cb-head">
+        <span class="cb-dot" style="background:#F23A3F"></span><span class="cb-dot" style="background:#FFC132"></span><span class="cb-dot" style="background:#329345"></span>
+        <span class="cb-title">hello-reallms.sh — straight from the IU KB</span>
+        <button class="copy-btn" data-copy-target="hello-curl" aria-label="Copy curl example">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M11 0H0v11h3V9H2V2h7v1h2V0Z"/><path d="M16 5H5v11h11V5Zm-9 9V7h7v7H7Z"/></svg> Copy
+        </button>
+      </div>
+      <pre id="hello-curl"><span class="c"># List available models</span>
+curl -X GET https://reallms.rescloud.iu.edu/direct/v1/models \
+  -H <span class="s">"Authorization: Bearer &lt;API-KEY&gt;"</span>
+
+<span class="c"># Send a message to a model</span>
+curl -X POST --location https://reallms.rescloud.iu.edu/direct/v1/chat/completions \
+  --header <span class="s">'Authorization: Bearer &lt;API-KEY&gt;'</span> \
+  --header <span class="s">'Content-Type: application/json'</span> \
+  --data <span class="s">'{
+  "model": "gemma-4-31B-it",
+  "messages": [
+    { "role": "user", "content": "Why is the sky blue?" }
+  ]
+}'</span></pre>
+    </div>
+    <p class="model-note reveal" style="max-width:860px">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14Zm0-1a6 6 0 1 0 0-12 6 6 0 0 0 0 12ZM7 4h2v5H7V4Zm0 6h2v2H7v-2Z"/></svg>
+      <span><strong>Running at scale?</strong> If your workflow needs high throughput, UITS recommends the <strong>HPC LLM platform</strong> on IU's research supercomputers — heavy usage of the API may result in rate-limiting. The service is in beta and may see unexpected downtime and changes.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ============ MODELS ============ -->
+<section id="models" style="background:rgba(24,37,52,.35);border-block:1px solid var(--glass-brd)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The lineup</span>
+      <h2>Available models</h2>
+      <p>The current roster served by REALLMS — the same lineup powers the Chat app and the API. The curated selection is reviewed regularly, and you can request new models via the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener">REALLMS Model Request Form</a>.</p>
+    </div>
+    <div class="model-groups">
+      <div class="reveal">
+        <div class="mg-label"><span class="chip chip-blue">Chat &amp; completions</span><span class="line"></span></div>
+        <div class="model-grid">
+          <div class="model" style="--mt:rgba(99,177,211,.2);--mb:rgba(99,177,211,.5)">
+            <div class="mn">Gemma 4 31B</div><span class="mid">gemma-4-31B-it</span>
+            <div class="mbadges"><span class="mbadge hl">256K context</span><span class="mbadge">BF16</span></div>
+          </div>
+          <div class="model" style="--mt:rgba(242,58,63,.16);--mb:rgba(242,58,63,.5)">
+            <div class="mn">GLM 5.2</div><span class="mid">glm-5.2</span>
+            <div class="mbadges"><span class="mbadge hl">256K context</span><span class="mbadge">FP8</span></div>
+          </div>
+          <div class="model" style="--mt:rgba(255,193,50,.14);--mb:rgba(255,193,50,.5)">
+            <div class="mn">GPT OSS 120B</div><span class="mid">gpt-oss-120b</span>
+            <div class="mbadges"><span class="mbadge hl">128K context</span><span class="mbadge">BF16+UB</span></div>
+          </div>
+          <div class="model" style="--mt:rgba(99,177,211,.2);--mb:rgba(99,177,211,.5)">
+            <div class="mn">Qwen3 Coder Next</div><span class="mid">Qwen3-Coder-Next</span>
+            <div class="mbadges"><span class="mbadge hl">256K context</span><span class="mbadge">FP8</span><span class="mbadge">code-tuned</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="mg-label"><span class="chip chip-gold">Embeddings</span><span class="line"></span></div>
+        <div class="model-grid">
+          <div class="model" style="--mt:rgba(255,193,50,.16);--mb:rgba(255,193,50,.5)">
+            <div class="mn">Qwen3 Embedding 8B</div><span class="mid">Qwen3-Embedding-8B</span>
+            <div class="mbadges"><span class="mbadge">POST /embeddings</span><span class="mbadge">RAG pipelines</span></div>
+          </div>
+          <div class="model" style="--mt:rgba(255,193,50,.16);--mb:rgba(255,193,50,.5)">
+            <div class="mn">EmbeddingGemma 300M</div><span class="mid">embeddinggemma-300m</span>
+            <div class="mbadges"><span class="mbadge">POST /embeddings</span><span class="mbadge">lightweight</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="mg-label"><span class="chip chip-crimson">Reranking</span><span class="line"></span></div>
+        <div class="model-grid">
+          <div class="model" style="--mt:rgba(242,58,63,.18);--mb:rgba(242,58,63,.5)">
+            <div class="mn">Qwen3 Reranker 8B</div><span class="mid">Qwen3-Reranker-8B</span>
+            <div class="mbadges"><span class="mbadge">POST /rerank</span><span class="mbadge">sharper retrieval</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="model-note reveal">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14Zm0-1a6 6 0 1 0 0-12 6 6 0 0 0 0 12ZM7 4h2v5H7V4Zm0 6h2v2H7v-2Z"/></svg>
+      <span>Context lengths and tensor types are published for the <strong>REALLMS Chat</strong> roster (see the IU KB). Models can change: one general-purpose model is long-term supported with at least three months' notice, and all others get 30 days. The live list is always in the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">API documentation</a> — or call <code style="font-family:ui-monospace,monospace">/models</code> with your key.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ============ USE CASES ============ -->
+<section id="use-cases">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">What people do with it</span>
+      <h2>Main use cases</h2>
+      <p>From everyday research assistance to custom agents wired into your codebase — here's where REALLMS shows up.</p>
+    </div>
+    <div class="uc-grid">
+      <div class="uc uc-chat reveal">
+        <h3><span class="uic"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3.2a1.8 1.8 0 0 1 1.8-1.8h10.4A1.8 1.8 0 0 1 15 3.2v6.6a1.8 1.8 0 0 1-1.8 1.8H6.3L2.6 13.6A.8.8 0 0 1 1 13V3.2Z"/></svg></span> REALLMS Chat</h3>
+        <div class="uc-list">
+          <div class="uc-item">
+            <span class="ui"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M2 2a1.5 1.5 0 0 1 1.5-1.5H7V2H3.5L2 3.5V14.5h8.5V13h2v2A1.5 1.5 0 0 1 11 15.5H3.5A1.5 1.5 0 0 1 2 14V2Zm9.5-1.5H14v6h-1.5V4L11 5.5V2Z"/></svg></span>
+            <div><h4>Read &amp; question your documents</h4><p>Upload PDFs and data files, then ask questions with the context of your own material.</p></div>
+          </div>
+          <div class="uc-item">
+            <span class="ui"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a4.5 4.5 0 0 1 2.8 8.05c.35.27.7.59.75 1.15a2.5 2.5 0 0 1-5 .05 4.5 4.5 0 0 1 1.45-9.25ZM4 13h8v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1Z"/></svg></span>
+            <div><h4>Drafting, brainstorming, writing</h4><p>Grants, papers, proposals, slides — iterate on drafts with whichever model you like.</p></div>
+          </div>
+          <div class="uc-item">
+            <span class="ui"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3h14v10H1V3Zm1.5 1.5v7h11v-7h-11Zm1.1 4.2 2.4-3 2.1 2.7 1.6-2 2.8 3.8H4.6Z"/></svg></span>
+            <div><h4>Image generation</h4><p>Generate images directly inside the chat interface.</p></div>
+          </div>
+          <div class="uc-item">
+            <span class="ui"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M2 1h5.5L9 3.5h5A1.5 1.5 0 0 1 15.5 5v8A1.5 1.5 0 0 1 14 14.5H2A1.5 1.5 0 0 1 .5 13V2.5A1.5 1.5 0 0 1 2 1Zm5 1.5H2v.5h5V2.5Z"/></svg></span>
+            <div><h4>Knowledge collections &amp; folders</h4><p>Share curated knowledge with your group, apply it to whole folders of chats, and connect Google Drive / OneDrive sources.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="uc uc-api reveal reveal-d1">
+        <h3><span class="uic"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.83 2.17a.75.75 0 0 1 1.06 0l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06L10.19 8 5.83 3.67a.75.75 0 0 1 0-1.06Zm-4 0a.75.75 0 0 1 1.06 0L8 8l-5.11 5.11a.75.75 0 1 1-1.06-1.06L6.94 8 2.58 3.67a.75.75 0 0 1 0-1.06Z"/></svg></span> REALLMS API</h3>
+        <div class="uc-list">
+          <div class="uc-item">
+            <span class="ui"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2h14v10H1V2Zm1.5 1.5v7h11v-7h-11ZM2 13.5h12v1H2v-1Z"/></svg></span>
+            <div><h4>IDEs &amp; coding agents</h4><p>Point Codex CLI, opencode, or any OpenAI-compatible IDE plugin at <code>Qwen3-Coder-Next</code> for on-prem code assistance.</p></div>
+          </div>
+          <div class="uc-item">
+            <span class="ui"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a5 5 0 0 1 5 5v1h1a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1V6a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v1h6V6a3 3 0 0 0-3-3ZM5 9a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg></span>
+            <div><h4>Agent harnesses &amp; evals</h4><p>Build LLM harnesses, automated graders, and pipelines — call <code>/chat/completions</code> from any framework.</p></div>
+          </div>
+          <div class="uc-item">
+            <span class="ui"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M2 1h12A1.5 1.5 0 0 1 15.5 2.5v11A1.5 1.5 0 0 1 14 15H2a1.5 1.5 0 0 1-1.5-1.5v-11A1.5 1.5 0 0 1 2 1Zm.5 2v9h11V3H2.5ZM3 5h4v2H3V5Zm5.5 0H13v1H8.5V5ZM3 8h4.5v1H3V8Zm5.5 0H13v1H8.5V8ZM3 11h4v1H3v-1Zm5.5 0H13v1H8.5v-1Z"/></svg></span>
+            <div><h4>RAG &amp; retrieval apps</h4><p>Pair <code>Qwen3-Embedding-8B</code> with <code>Qwen3-Reranker-8B</code> for embed → retrieve → rerank → generate stacks.</p></div>
+          </div>
+          <div class="uc-item">
+            <span class="ui"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1Zm-.4 3.5v4.4l3.2 1.9.8-1.3-2.6-1.5V4.5H7.6Z"/></svg></span>
+            <div><h4>Class &amp; service integrations</h4><p>Run live LLM demos in teaching, or add LLM features to lab tools and services — no vendor cloud, no per-token bills.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ============ SETUP GUIDES ============ -->
+    <div id="setup">
+      <div class="integ-head reveal">
+        <h3>Plug REALLMS into your tools</h3>
+      </div>
+      <p class="model-note reveal" style="justify-content:center;margin-top:-16px;margin-bottom:30px">
+        <span>Set <code style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(226,231,233,.09);padding:2px 8px;border-radius:6px;color:var(--iu-blue-200)">REALLMS_API_KEY</code> to the key you created in RT Projects, then add a provider pointing at the base URL above.</span>
+      </p>
+      <div class="integ-grid">
+        <div class="integ integ-codex reveal">
+          <div class="integ-head-row">
+            <div class="integ-logo" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1Zm3.5 4h-2V3.5h-3V5h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1Z"/></svg>
+            </div>
+            <div>
+              <h4>Codex CLI</h4>
+              <p>OpenAI Codex CLI · ~/.codex/config.toml</p>
+            </div>
+          </div>
+          <div class="steps"><b>1.</b> Add a REALLMS provider to <code>~/.codex/config.toml</code> and <b>2.</b> export your key — then just run <code>codex</code>.</div>
+          <div class="codeblock">
+            <div class="cb-head"><span class="cb-title">~/.codex/config.toml</span>
+              <button class="copy-btn" data-copy-target="codex-config" aria-label="Copy Codex config"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M11 0H0v11h3V9H2V2h7v1h2V0Z"/><path d="M16 5H5v11h11V5Zm-9 9V7h7v7H7Z"/></svg> Copy</button>
+            </div>
+            <pre id="codex-config">model_provider = <span class="s">"reallms"</span>
+model = <span class="s">"gpt-oss-120b"</span>
+
+<span class="k">[model_providers.reallms]</span>
+name = <span class="s">"REALLMS (IU)"</span>
+base_url = <span class="s">"https://reallms.rescloud.iu.edu/direct/v1"</span>
+wire_api = <span class="s">"chat"</span>
+env_key = <span class="s">"REALLMS_API_KEY"</span>
+
+<span class="c"># in your shell, before running codex</span>
+<span class="c"># export REALLMS_API_KEY=your-key</span></pre>
+          </div>
+        </div>
+
+        <div class="integ integ-opencode reveal reveal-d1">
+          <div class="integ-head-row">
+            <div class="integ-logo" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.83 2.17a.75.75 0 0 1 1.06 0l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06L10.19 8 5.83 3.67a.75.75 0 0 1 0-1.06Zm-4 0a.75.75 0 0 1 1.06 0L8 8l-5.11 5.11a.75.75 0 1 1-1.06-1.06L6.94 8 2.58 3.67a.75.75 0 0 1 0-1.06Z"/></svg>
+            </div>
+            <div>
+              <h4>opencode</h4>
+              <p>opencode · opencode.json</p>
+            </div>
+          </div>
+          <div class="steps"><b>1.</b> Register REALLMS as an OpenAI-compatible provider in <code>opencode.json</code>, then <b>2.</b> select any model as <code>reallms/&lt;model&gt;</code>.</div>
+          <div class="codeblock">
+            <div class="cb-head"><span class="cb-title">opencode.json</span>
+              <button class="copy-btn" data-copy-target="opencode-config" aria-label="Copy opencode config"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M11 0H0v11h3V9H2V2h7v1h2V0Z"/><path d="M16 5H5v11h11V5Zm-9 9V7h7v7H7Z"/></svg> Copy</button>
+            </div>
+            <pre id="opencode-config">{
+  <span class="k">"$schema"</span>: <span class="s">"https://opencode.ai/config.json"</span>,
+  <span class="k">"provider"</span>: {
+    <span class="k">"reallms"</span>: {
+      <span class="k">"npm"</span>: <span class="s">"@ai-sdk/openai-compatible"</span>,
+      <span class="k">"name"</span>: <span class="s">"REALLMS (IU)"</span>,
+      <span class="k">"options"</span>: {
+        <span class="k">"baseURL"</span>: <span class="s">"https://reallms.rescloud.iu.edu/direct/v1"</span>,
+        <span class="k">"apiKey"</span>: <span class="s">"{env:REALLMS_API_KEY}"</span>
+      },
+      <span class="k">"models"</span>: {
+        <span class="k">"gpt-oss-120b"</span>:     { <span class="k">"name"</span>: <span class="s">"GPT OSS 120B"</span> },
+        <span class="k">"Qwen3-Coder-Next"</span>: { <span class="k">"name"</span>: <span class="s">"Qwen3 Coder Next"</span> },
+        <span class="k">"gemma-4-31B-it"</span>:   { <span class="k">"name"</span>: <span class="s">"Gemma 4 31B"</span> },
+        <span class="k">"glm-5.2"</span>:          { <span class="k">"name"</span>: <span class="s">"GLM 5.2"</span> }
+      }
+    }
+  }
+}</pre>
+          </div>
+        </div>
+
+        <div class="integ integ-generic reveal">
+          <div class="integ-head-row">
+            <div class="integ-logo" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M5.83 2.17a.75.75 0 0 1 1.06 0l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06L10.19 8 5.83 3.67a.75.75 0 0 1 0-1.06Zm-4 0a.75.75 0 0 1 1.06 0L8 8l-5.11 5.11a.75.75 0 1 1-1.06-1.06L6.94 8 2.58 3.67a.75.75 0 0 1 0-1.06Z"/></svg>
+            </div>
+            <div>
+              <h4>Any OpenAI-compatible client</h4>
+              <p>Python · curl · your framework</p>
+            </div>
+          </div>
+          <div class="steps">Every OpenAI SDK works as-is — swap the <code>base_url</code> and <code>api_key</code>, pick a model ID, and you're on IU infrastructure.</div>
+          <div class="codeblock">
+            <div class="cb-head"><span class="cb-title">reallms_client.py</span>
+              <button class="copy-btn" data-copy-target="py-config" aria-label="Copy Python example"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M11 0H0v11h3V9H2V2h7v1h2V0Z"/><path d="M16 5H5v11h11V5Zm-9 9V7h7v7H7Z"/></svg> Copy</button>
+            </div>
+            <pre id="py-config"><span class="k">import</span> os
+<span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+    base_url=<span class="s">"https://reallms.rescloud.iu.edu/direct/v1"</span>,
+    api_key=os.environ[<span class="s">"REALLMS_API_KEY"</span>],
+)
+
+resp = client.chat.completions.<span class="k">create</span>(
+    model=<span class="s">"gpt-oss-120b"</span>,
+    messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"Why is the sky blue?"</span>}],
+)
+<span class="k">print</span>(resp.choices[0].message.content)</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GOOD TO KNOW ============ -->
+<section id="help" style="background:rgba(24,37,52,.35);border-block:1px solid var(--glass-brd)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Good to know</span>
+      <h2>The fine print, made friendly</h2>
+    </div>
+    <div class="gtk-grid">
+      <div class="gtk reveal">
+        <div class="gi"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a5 5 0 0 1 5 5v1h1a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h1V6a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v1h6V6a3 3 0 0 0-3-3ZM5 9a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm6 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg></div>
+        <h4>Your data stays on campus</h4>
+        <p>All infrastructure runs in the IU Data Center. Chats live in the REALLMS Chat web app and aren't used for analysis; data sent to the API is <strong>not stored</strong>. Both services are approved for Critical research data and PHI.</p>
+      </div>
+      <div class="gtk reveal reveal-d1">
+        <div class="gi"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14Zm0-1a6 6 0 1 0 0-12 6 6 0 0 0 0 12ZM8 4a.75.75 0 0 1 .75.75v3.5l2.5 1.5a.75.75 0 1 1-.75 1.3l-2.875-1.725A.75.75 0 0 1 7.25 8.25v-3.5A.75.75 0 0 1 8 4Z"/></svg></div>
+        <h4>24×7, with light maintenance</h4>
+        <p>Generally available around the clock. Scheduled model and security updates happen in UITS-RT maintenance windows (second Sunday, 7am–7pm ET) with minimal, usually under-two-hour, downtime.</p>
+      </div>
+      <div class="gtk reveal reveal-d2">
+        <div class="gi"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M1 3.2a1.8 1.8 0 0 1 1.8-1.8h10.4A1.8 1.8 0 0 1 15 3.2v6.6a1.8 1.8 0 0 1-1.8 1.8H6.3L2.6 13.6A.8.8 0 0 1 1 13V3.2Zm3.5 3.3a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8Zm3.5 0a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8Zm3.5 0a.9.9 0 1 0 0-1.8.9.9 0 0 0 0 1.8Z"/></svg></div>
+        <h4>Get help, request models</h4>
+        <p>Questions? Contact the <strong>UITS REALLMS team</strong> or the <a href="https://projects.rt.iu.edu/help/?queue=racs" target="_blank" rel="noopener">REALLMS help desk</a>. Want a different model? Fill out the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener">REALLMS Model Request Form</a>. Join the <strong>#reallms</strong> channel on the IU HPC &amp; AI User Community Slack to connect with the team and other researchers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="rvt-lockup" href="#top" aria-label="REALLMS, Indiana University — home">
+          <div class="rvt-lockup__tab">
+            <svg xmlns="http://www.w3.org/2000/svg" class="rvt-lockup__trident" viewBox="0 0 28 34" aria-hidden="true">
+              <path d="M-3.34344e-05 4.70897H8.83308V7.174H7.1897V21.1426H10.6134V2.72321H8.83308V0.121224H18.214V2.65476H16.2283V21.1426H19.7889V7.174H18.214V4.64047H27.0471V7.174H25.0614V23.6761L21.7746 26.8944H16.2967V30.455H18.214V33.8787H8.76463V30.592H10.6819V26.8259H5.20403L1.91726 23.6077V7.174H-3.34344e-05V4.70897Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <div class="rvt-lockup__body">
+            <span class="rvt-lockup__title" style="font-size:1.1rem">REAL<span class="trident-red">LMS</span></span>
+            <span class="rvt-lockup__subtitle">Indiana University</span>
+          </div>
+        </a>
+        <p>Research and Academic LLM Services — free, on-premises large language models for the IU community, operated by UITS in the IU Data Center.</p>
+      </div>
+      <div class="foot">
+        <h5>Get started</h5>
+        <ul>
+          <li><a href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg>REALLMS Chat</a></li>
+          <li><a href="https://projects.rt.iu.edu" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg>RT Projects (API access)</a></li>
+          <li><a href="#setup"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg>Codex &amp; opencode setup</a></li>
+          <li><a href="#models"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg>Available models</a></li>
+        </ul>
+      </div>
+      <div class="foot">
+        <h5>Documentation</h5>
+        <ul>
+          <li><a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg>About REALLMS (IU KB)</a></li>
+          <li><a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg>REALLMS API (IU KB)</a></li>
+          <li><a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg>Using RT Projects (IU KB)</a></li>
+          <li><a href="https://projects.rt.iu.edu/help/?queue=racs" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 14h5.5v-2h-1.382l-.366-.733a2.86 2.86 0 0 1-.298-1.12l-.234-4.209A5.23 5.23 0 0 0 9 1.096V0H7v1.096a5.23 5.23 0 0 0-4.22 4.842l-.234 4.209a2.86 2.86 0 0 1-.298 1.12L1.882 12H.5v2H6a2 2 0 1 0 4 0Zm1.886-2H4.114a4.86 4.86 0 0 0 .429-1.742l.234-4.209a3.228 3.228 0 0 1 6.446 0l.234 4.209A4.86 4.86 0 0 0 11.886 12Z"/></svg>REALLMS help desk</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>REALLMS is supported and managed by UITS. See the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener" style="color:var(--iu-blue-200)">REALLMS terms of service</a> for details.</p>
+      <p>Not an official IU web design system page — branded with the IU <a href="https://rivet.iu.edu" target="_blank" rel="noopener" style="color:var(--iu-blue-200)">Rivet design system</a>.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var MODEL_TICKER = [
+    { id:"gemma-4-31B-it", c:"#63B1D3" },
+    { id:"glm-5.2", c:"#F23A3F" },
+    { id:"gpt-oss-120b", c:"#FFC132" },
+    { id:"Qwen3-Coder-Next", c:"#63B1D3" },
+    { id:"Qwen3-Embedding-8B", c:"#FFC132" },
+    { id:"embeddinggemma-300m", c:"#FFC132" },
+    { id:"Qwen3-Reranker-8B", c:"#F23A3F" }
+  ];
+
+  var ticker = document.getElementById("ticker");
+  if (ticker) {
+    var html = "";
+    MODEL_TICKER.forEach(function(m){
+      html += '<span><i class="tk-dot" style="background:'+m.c+'"></i>'+m.id+'</span>';
+    });
+    ticker.innerHTML = html + html;
+  }
+
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var els = document.querySelectorAll(".reveal");
+  if (reduce || !("IntersectionObserver" in window)) {
+    els.forEach(function(el){ el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12 });
+    els.forEach(function(el){ io.observe(el); });
+  }
+
+  function flash(btn){
+    var orig = btn.innerHTML;
+    btn.textContent = "Copied ✓";
+    setTimeout(function(){ btn.innerHTML = orig; }, 1400);
+  }
+  document.querySelectorAll("[data-copy]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var text = btn.getAttribute("data-copy") || "";
+      var target = btn.getAttribute("data-copy-target");
+      if (target) {
+        var el = document.getElementById(target);
+        if (el) text = el.textContent;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function(){ flash(btn); }).catch(function(){ flash(btn); });
+      } else { flash(btn); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

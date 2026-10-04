@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REALLMS — Research and Academic LLM Services at IU</title>
+<meta name="description" content="REALLMS: free, on-premises LLM service for the IU community — REALLMS Chat and the REALLMS API, operated by UITS Research Technologies.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<!--
+  IU branding: Rivet design system tokens (via the IU Rivet MCP server, https://rivetmcp.apps.iu.edu/mcp)
+  --rvt-color-crimson-500:#990000 · crimson-400:#DC231E · crimson-300:#F23A3F · crimson-200:#FF636A
+  --rvt-color-gold-400:#FFC132 · gold-500:#FFAA00
+  --rvt-color-blue-500:#006298 · blue-300:#63B1D3 · blue-200:#94D2E7
+  --rvt-color-black-700:#0E1825 · black-500:#243142 · black-300:#75838F · black-100:#E2E7E9
+  spacing: --rvt-spacing-md 24px · lg 32px · xl 40px · xxl 64px · typeScale: --rvt-ts-52 52px, --rvt-ts-26 26px --
+-->
+<style>
+:root{
+  /* Rivet tokens */
+  --rvt-crimson-500:#990000; --rvt-crimson-400:#DC231E; --rvt-crimson-300:#F23A3F; --rvt-crimson-200:#FF636A;
+  --rvt-crimson-700:#5A0C0C; --rvt-crimson-000:#FFF7F8;
+  --rvt-gold-400:#FFC132; --rvt-gold-500:#FFAA00; --rvt-gold-600:#A36B00; --rvt-gold-000:#FFFCEB;
+  --rvt-blue-500:#006298; --rvt-blue-400:#328BB8; --rvt-blue-300:#63B1D3; --rvt-blue-200:#94D2E7; --rvt-blue-000:#EDFAFD;
+  --rvt-black-700:#0E1825; --rvt-black-600:#182534; --rvt-black-500:#243142; --rvt-black-400:#4C5A69;
+  --rvt-black-300:#75838F; --rvt-black-200:#A0ABB4; --rvt-black-100:#E2E7E9; --rvt-black-000:#F8F9FA;
+  --rvt-space-xxs:4px; --rvt-space-xs:8px; --rvt-space-sm:16px; --rvt-space-md:24px;
+  --rvt-space-lg:32px; --rvt-space-xl:40px; --rvt-space-xxl:64px; --rvt-space-3xl:128px;
+  --rvt-ts-12:0.75rem; --rvt-ts-14:0.875rem; --rvt-ts-16:1rem; --rvt-ts-18:1.125rem;
+  --rvt-ts-20:1.25rem; --rvt-ts-26:1.625rem; --rvt-ts-32:2rem; --rvt-ts-41:2.5625rem; --rvt-ts-52:3.25rem;
+  --font-display:'Sora',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  /* page theme (dark) built ONLY from rivet tokens */
+  --ink-bg:#070B12;
+  --text:#EDF2F5; --muted:#9FB0BE;
+  --line:rgba(255,255,255,.09);
+  --glass:rgba(255,255,255,.045); --glass-2:rgba(255,255,255,.075);
+  --radius:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--ink-bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+::selection{background:var(--rvt-crimson-500);color:#fff}
+
+/* background aurora built from IU crimson/gold/blue */
+.bg{position:fixed;inset:0;z-index:-2;background:
+ radial-gradient(1200px 700px at 85% -10%, rgba(153,0,0,.38), transparent 60%),
+ radial-gradient(900px 600px at -10% 20%, rgba(0,98,152,.30), transparent 60%),
+ radial-gradient(700px 500px at 50% 112%, rgba(255,170,0,.10), transparent 60%),
+ var(--ink-bg)}
+.bg::after{content:"";position:absolute;inset:0;
+ background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+ background-size:56px 56px;
+ mask-image:radial-gradient(ellipse 90% 60% at 50% 0%,#000 30%,transparent 78%)}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;z-index:-1;animation:drift 18s ease-in-out infinite alternate}
+.orb-1{width:520px;height:520px;top:-160px;right:-120px;background:radial-gradient(circle,var(--rvt-crimson-500),transparent 65%)}
+.orb-2{width:460px;height:460px;top:24%;left:-180px;background:radial-gradient(circle,var(--rvt-blue-500),transparent 65%);animation-delay:-6s}
+.orb-3{width:380px;height:380px;bottom:-140px;right:12%;background:radial-gradient(circle,rgba(255,170,0,.5),transparent 65%);animation-delay:-12s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,60px) scale(1.12)}}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 var(--rvt-space-md)}
+
+/* ---------- nav (Rivet lockup-inspired) ---------- */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(7,11,18,.74);border-bottom:3px solid var(--rvt-crimson-500)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px}
+/* rvt-lockup: trident tab + title/body, IU crimson tab like rvt-lockup__tab */
+.lockup{display:flex;align-items:stretch;gap:12px;text-decoration:none;color:var(--text)}
+.trident-tab{width:44px;background:var(--rvt-crimson-500);border-radius:10px;display:grid;place-items:center;
+ box-shadow:0 6px 24px rgba(153,0,0,.45);transition:.25s}
+.lockup:hover .trident-tab{background:var(--rvt-crimson-400)}
+.trident-tab svg{width:20px;height:24px;color:#fff;display:block}
+.lockup-body{display:flex;flex-direction:column;justify-content:center}
+.lockup-title{font-family:var(--font-display);font-weight:800;letter-spacing:.05em;font-size:18px;line-height:1.05}
+.lockup-sub{font-size:10.5px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase}
+.nav-links{display:flex;gap:var(--rvt-space-md);align-items:center;font-size:14px}
+.nav-links a{color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:#fff}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:var(--rvt-space-xs);font-family:var(--font-display);font-weight:600;
+ font-size:14px;padding:12px 20px;border-radius:12px;text-decoration:none;transition:.25s;white-space:nowrap;border:0;cursor:pointer}
+.btn svg{width:15px;height:15px}
+.btn-primary{background:var(--rvt-crimson-500);color:#fff;
+ box-shadow:0 8px 28px rgba(153,0,0,.4),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn-primary:hover{background:var(--rvt-crimson-400);transform:translateY(-2px);box-shadow:0 14px 36px rgba(220,35,30,.5)}
+.btn-gold{background:var(--rvt-gold-400);color:var(--rvt-black-700);
+ box-shadow:0 8px 28px rgba(255,170,0,.3),inset 0 1px 0 rgba(255,255,255,.45)}
+.btn-gold:hover{background:var(--rvt-gold-500);transform:translateY(-2px)}
+.btn-ghost{border:1px solid var(--line);color:var(--text);background:var(--glass)}
+.btn-ghost:hover{background:var(--glass-2);transform:translateY(-2px)}
+
+/* ---------- hero ---------- */
+header{padding:96px 0 var(--rvt-space-3xl);text-align:center;position:relative}
+.pill{display:inline-flex;align-items:center;gap:var(--rvt-space-xs);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
+ color:var(--rvt-gold-400);border:1px solid rgba(255,193,50,.35);background:rgba(255,193,50,.08);
+ padding:7px 16px;border-radius:999px;font-weight:600;margin-bottom:var(--rvt-space-md)}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--rvt-gold-400);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,193,50,.5)}50%{box-shadow:0 0 0 7px rgba(255,193,50,0)}}
+h1{font-family:var(--font-display);font-size:clamp(42px,6.5vw,82px);font-weight:800;line-height:1.05;letter-spacing:-.02em}
+h1 .grad{background:linear-gradient(92deg,var(--rvt-crimson-200) 0%,var(--rvt-gold-400) 52%,var(--rvt-blue-300) 108%);
+ -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{max-width:740px;margin:26px auto 0;color:var(--muted);font-size:clamp(16px,2vw,19px)}
+.hero-sub b{color:var(--text)}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:var(--rvt-space-xl)}
+.hero-stats{display:flex;gap:var(--rvt-space-xl);justify-content:center;flex-wrap:wrap;margin-top:var(--rvt-space-3xl)}
+.stat{min-width:150px;position:relative}
+.stat b{display:block;font-family:var(--font-display);font-size:29px;font-weight:800;color:#fff}
+.stat span{font-size:13px;color:var(--muted);letter-spacing:.03em}
+.free-flag{display:inline-flex;align-items:center;gap:6px;background:var(--rvt-gold-400);color:var(--rvt-black-700);
+ font-family:var(--font-display);font-weight:800;font-size:13px;letter-spacing:.08em;padding:7px 14px;border-radius:8px;
+ transform:rotate(-2deg);box-shadow:0 8px 24px rgba(255,170,0,.35)}
+</style>
+<style>
+/* ---------- sections ---------- */
+section{padding:96px 0}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:700;letter-spacing:.22em;
+ text-transform:uppercase;color:var(--rvt-crimson-200);margin-bottom:var(--rvt-space-sm)}
+.eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--rvt-crimson-400),var(--rvt-gold-400))}
+h2{font-family:var(--font-display);font-size:clamp(30px,4.2vw,46px);font-weight:800;letter-spacing:-.015em;line-height:1.12}
+.lead{color:var(--muted);max-width:660px;margin-top:14px;font-size:17px}
+.lead a{color:var(--rvt-blue-300)}
+.sec-head{margin-bottom:var(--rvt-space-xxl)}
+.sec-head.center{text-align:center}
+.sec-head.center .lead{margin-left:auto;margin-right:auto}
+.sec-head.center .eyebrow{justify-content:center}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- pillars ---------- */
+.pillars{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.pillar{position:relative;border:1px solid var(--line);border-radius:var(--radius);padding:var(--rvt-space-lg);
+ background:linear-gradient(180deg,var(--glass-2),var(--glass));backdrop-filter:blur(8px);
+ overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;display:flex;flex-direction:column}
+.pillar:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.2);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.pillar::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+ background:linear-gradient(135deg,transparent 30%,var(--glow,rgba(255,99,106,.5)),transparent 70%);
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+ -webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .35s;pointer-events:none}
+.pillar:hover::before{opacity:1}
+.pillar.chat{--glow:rgba(255,99,106,.55)}
+.pillar.api{--glow:rgba(99,177,211,.55)}
+.p-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:var(--rvt-space-md)}
+.p-icon{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:25px;flex-shrink:0}
+.chat .p-icon{background:linear-gradient(135deg,rgba(220,35,30,.28),rgba(153,0,0,.55));box-shadow:inset 0 0 0 1px rgba(255,99,106,.4)}
+.api .p-icon{background:linear-gradient(135deg,rgba(0,98,152,.35),rgba(50,139,184,.45));box-shadow:inset 0 0 0 1px rgba(99,177,211,.4)}
+.p-stack{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.p-tag{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border-radius:7px}
+.chat .p-tag{background:rgba(220,35,30,.16);color:var(--rvt-crimson-200);border:1px solid rgba(220,35,30,.45)}
+.api .p-tag{background:rgba(50,139,184,.16);color:var(--rvt-blue-300);border:1px solid rgba(50,139,184,.5)}
+.beta{font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--rvt-gold-400);border:1px dashed rgba(255,193,50,.5);
+ padding:4px 9px;border-radius:7px;background:rgba(255,193,50,.06)}
+.pillar h3{font-family:var(--font-display);font-size:var(--rvt-ts-26);font-weight:800;margin-bottom:10px}
+.pillar>p{color:var(--muted);font-size:15px}
+.arch{display:flex;gap:8px;flex-wrap:wrap;margin:var(--rvt-space-md) 0 0}
+.arch span{font-family:var(--font-mono);font-size:11.5px;color:var(--rvt-blue-200);background:rgba(0,98,152,.18);
+ border:1px solid rgba(99,177,211,.3);padding:5px 11px;border-radius:8px}
+.arch .arrow{border:0;background:none;color:var(--rvt-black-300);padding:5px 0}
+.feat-mini{list-style:none;margin:var(--rvt-space-md) 0;flex-grow:1;display:grid;gap:10px;font-size:13.8px;color:var(--muted)}
+.feat-mini li{display:flex;gap:10px;align-items:flex-start}
+.feat-mini .tick{color:var(--rvt-gold-400);font-weight:800;flex-shrink:0}
+.p-meta{margin-bottom:var(--rvt-space-sm);padding:12px 16px;border-radius:12px;background:rgba(0,0,0,.35);
+ border:1px solid var(--line);font-family:var(--font-mono);font-size:12.5px;color:var(--rvt-blue-200);
+ display:flex;align-items:center;gap:10px;overflow-wrap:anywhere}
+.p-meta .lbl{color:var(--rvt-black-300);font-family:var(--font-body);font-size:10.5px;letter-spacing:.14em;
+ text-transform:uppercase;flex-shrink:0}
+.p-links{display:flex;gap:12px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;text-decoration:none;
+ padding:9px 15px;border-radius:10px;border:1px solid var(--line);color:var(--text);background:var(--glass);transition:.2s}
+.chip:hover{border-color:var(--rvt-gold-400);color:var(--rvt-gold-400);transform:translateY(-1px)}
+
+/* ---------- flow ---------- */
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative;margin-top:14px}
+.flow-step{position:relative;padding:0 var(--rvt-space-sm);text-align:center;z-index:1}
+.flow-node{width:80px;height:80px;margin:0 auto 20px;border-radius:24px;display:grid;place-items:center;font-size:29px;
+ background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
+ border:1px solid rgba(255,255,255,.16);position:relative;z-index:2;
+ box-shadow:0 12px 34px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.15);transition:transform .3s}
+.flow-step:hover .flow-node{transform:translateY(-6px) rotate(-4deg)}
+.flow-node .trident-tab{width:56px;height:56px;border-radius:16px}
+.flow-node .trident-tab svg{width:26px;height:31px}
+.flow-num{position:absolute;top:-10px;right:-8px;width:26px;height:26px;border-radius:50%;
+ background:linear-gradient(135deg,var(--rvt-gold-400),var(--rvt-gold-500));color:var(--rvt-black-700);
+ font-weight:800;font-size:13px;display:grid;place-items:center;font-family:var(--font-display);
+ box-shadow:0 4px 14px rgba(255,170,0,.5)}
+.flow-arrow{position:absolute;top:26px;z-index:3;width:30px;height:30px;color:var(--rvt-gold-400);
+ animation:slideR 1.8s ease-in-out infinite}
+@keyframes slideR{0%,100%{transform:translateX(-4px);opacity:.65}50%{transform:translateX(4px);opacity:1}}
+.flow h4{font-family:var(--font-display);font-size:15.5px;font-weight:700;margin-bottom:8px}
+.flow p{font-size:13px;color:var(--muted)}
+.flow .a{color:var(--rvt-blue-300);font-weight:600;text-decoration:none;border-bottom:1px dashed rgba(99,177,211,.5)}
+.flow .a:hover{color:var(--rvt-gold-400);border-color:var(--rvt-gold-400)}
+.flow-note{margin-top:var(--rvt-space-xl);border:1px solid rgba(255,193,50,.25);background:rgba(255,193,50,.06);
+ border-radius:16px;padding:20px var(--rvt-space-md);font-size:14.5px;color:#e7ddb9;display:flex;gap:14px;align-items:flex-start}
+.flow-note a{color:var(--rvt-gold-400)}
+
+/* ---------- use cases ---------- */
+.ucs{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.uc{border:1px solid var(--line);border-radius:var(--radius);padding:var(--rvt-space-lg);background:var(--glass);
+ display:flex;flex-direction:column;transition:.3s}
+.uc:hover{border-color:rgba(255,255,255,.22);transform:translateY(-4px)}
+.uc-badge{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+ padding:6px 12px;border-radius:8px;margin-bottom:18px}
+.uc-chat .uc-badge{background:rgba(220,35,30,.18);color:var(--rvt-crimson-200);border:1px solid rgba(220,35,30,.4)}
+.uc-api .uc-badge{background:rgba(50,139,184,.18);color:var(--rvt-blue-300);border:1px solid rgba(50,139,184,.45)}
+.uc h3{font-family:var(--font-display);font-size:var(--rvt-ts-20);font-weight:800;margin-bottom:8px}
+.uc>p{color:var(--muted);font-size:14.5px}
+.uc>p a{color:var(--rvt-blue-300)}
+.uc-list{list-style:none;margin-top:var(--rvt-space-sm);display:grid;gap:11px;font-size:14px;color:var(--muted)}
+.uc-list li{display:flex;gap:10px;align-items:flex-start}
+.uc-list .tick{color:var(--rvt-gold-400);flex-shrink:0;font-weight:800}
+.uc-list b{color:var(--text)}
+
+/* chat mock */
+.chatmock{background:#04070D;border:1px solid var(--line);border-radius:16px;padding:20px;
+ box-shadow:0 18px 50px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:13px;margin-top:var(--rvt-space-md);flex-grow:1}
+.chatmock .bar{display:flex;gap:8px;align-items:center;padding-bottom:13px;border-bottom:1px solid var(--line)}
+.chatmock .bar i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.chatmock .bar .f1{background:#FF5F57}.chatmock .bar .f2{background:#FEBC2E}.chatmock .bar .f3{background:#28C840}
+.chatmock .bar span{margin-left:8px;font-size:11.5px;color:var(--rvt-black-300);font-family:var(--font-mono)}
+.bubble{max-width:85%;padding:11px 15px;border-radius:14px;font-size:13px;line-height:1.55}
+.b-user{align-self:flex-end;background:linear-gradient(135deg,var(--rvt-crimson-500),var(--rvt-crimson-700));border-bottom-right-radius:4px}
+.b-bot{align-self:flex-start;background:rgba(255,255,255,.07);border:1px solid var(--line);border-bottom-left-radius:4px}
+.b-bot .who{display:block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--rvt-blue-300);margin-bottom:5px;font-weight:700}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:4px;animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.mock-input{margin-top:auto;display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;
+ padding:10px 14px;font-size:12.5px;color:var(--rvt-black-300);background:rgba(0,0,0,.3)}
+.mock-input .model-pick{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--rvt-gold-400);
+ border:1px solid rgba(255,193,50,.4);border-radius:7px;padding:3px 9px;background:rgba(255,193,50,.07)}
+
+/* api terminal mock */
+.term{background:#04070D;border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:var(--rvt-space-md);
+ box-shadow:0 18px 50px rgba(0,0,0,.5);font-family:var(--font-mono);font-size:12px;line-height:1.8;flex-grow:1}
+.term .prompt{color:var(--rvt-crimson-200)}
+.term .url{color:var(--rvt-blue-200)}
+.term .key{color:var(--rvt-gold-400)}
+.term .out{color:var(--rvt-black-200)}
+.term .m{color:#8fd18f}
+
+/* ---------- code windows ---------- */
+.code{background:#04070D;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.code-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.03)}
+.code-bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.code-bar .f1{background:#FF5F57}.code-bar .f2{background:#FEBC2E}.code-bar .f3{background:#28C840}
+.code-bar .file{margin-left:10px;font-family:var(--font-mono);font-size:12px;color:var(--rvt-black-300)}
+.code pre{padding:20px;overflow-x:auto;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;color:#cdd9e3}
+.code .k{color:#7dc4ff}.code .s{color:#ffd479}.code .c{color:#5d7080;font-style:italic}.code .p{color:#ff8f93}
+
+/* ---------- models ---------- */
+.model-bar{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:30px}
+.filters{display:flex;gap:var(--rvt-space-xs);flex-wrap:wrap}
+.fbtn{font-family:var(--font-display);font-weight:600;font-size:13px;padding:9px 16px;border-radius:999px;cursor:pointer;
+ border:1px solid var(--line);background:var(--glass);color:var(--muted);transition:.2s}
+.fbtn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.fbtn.active{background:var(--rvt-crimson-500);color:#fff;border-color:transparent;box-shadow:0 6px 20px rgba(153,0,0,.45)}
+.svc-toggle{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.svc-toggle button{font-family:var(--font-display);font-weight:700;font-size:13px;padding:10px 18px;border:0;cursor:pointer;
+ background:transparent;color:var(--muted);transition:.2s}
+.svc-toggle button.on{background:var(--rvt-blue-500);color:#fff}
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
+.mcard{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:var(--glass);transition:.25s;position:relative;overflow:hidden}
+.mcard:hover{border-color:rgba(255,193,50,.55);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.45)}
+.mcard::after{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--rvt-blue-400))}
+.mcard .fam{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent,var(--rvt-blue-300));margin-bottom:7px}
+.mcard b{display:block;font-family:var(--font-mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.mspecs{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.mtag{font-size:10.5px;font-weight:600;letter-spacing:.05em;padding:4px 9px;border-radius:6px;
+ background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
+.mtag.ctx{background:rgba(0,98,152,.16);border-color:rgba(99,177,211,.35);color:var(--rvt-blue-200)}
+.mtag.tt{background:rgba(255,193,50,.1);border-color:rgba(255,193,50,.35);color:var(--rvt-gold-400)}
+.ep-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:var(--rvt-space-xl)}
+.ep{border:1px solid var(--line);border-radius:16px;padding:var(--rvt-space-md);background:var(--glass);transition:.25s}
+.ep:hover{transform:translateY(-4px);border-color:rgba(99,177,211,.5)}
+.ep code{font-family:var(--font-mono);font-size:14px;color:var(--rvt-gold-400);display:block;margin-bottom:12px}
+.ep .desc{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.ep ul{list-style:none;display:grid;gap:8px}
+.ep li{font-family:var(--font-mono);font-size:12px;color:var(--rvt-blue-200);display:flex;gap:8px;align-items:center}
+.ep li::before{content:"▸";color:var(--rvt-crimson-200)}
+.models-note{margin-top:var(--rvt-space-lg);font-size:13.5px;color:var(--muted);text-align:center}
+.models-note a{color:var(--rvt-gold-400)}
+
+/* ---------- quickstart ---------- */
+.qs-url{display:flex;align-items:center;gap:14px;border:1px solid rgba(255,193,50,.3);background:rgba(255,193,50,.05);
+ border-radius:16px;padding:18px 22px;margin-bottom:var(--rvt-space-lg);flex-wrap:wrap}
+.qs-url .lbl{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--rvt-gold-400)}
+.qs-url code{font-family:var(--font-mono);font-size:clamp(13px,2.4vw,17px);color:var(--text)}
+.qs-url .copy{margin-left:auto}
+.qs-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.tool-card{border:1px solid var(--line);border-radius:var(--radius);background:var(--glass);overflow:hidden;
+ display:flex;flex-direction:column;transition:.3s}
+.tool-card:hover{border-color:rgba(255,255,255,.22)}
+.tool-head{display:flex;align-items:center;gap:14px;padding:26px 26px 18px}
+.tool-logo{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:21px;flex-shrink:0;font-family:var(--font-mono);font-weight:600}
+.codex .tool-logo{background:linear-gradient(135deg,#0f2a3f,var(--rvt-blue-500));box-shadow:inset 0 0 0 1px rgba(99,177,211,.4);color:var(--rvt-blue-200)}
+.oc .tool-logo{background:linear-gradient(135deg,#241a0a,#4d3a0e);box-shadow:inset 0 0 0 1px rgba(255,193,50,.4);color:var(--rvt-gold-400)}
+.tool-head h3{font-family:var(--font-display);font-size:19px;font-weight:800}
+.tool-head span{font-size:12.5px;color:var(--muted)}
+.tool-body{padding:0 26px 26px;display:flex;flex-direction:column;gap:var(--rvt-space-sm);flex-grow:1}
+.tool-body p{font-size:13.8px;color:var(--muted)}
+.inlinecode{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.07);border:1px solid var(--line);
+ padding:2px 7px;border-radius:6px;color:var(--rvt-blue-200)}
+.docs-link{margin-top:auto;font-size:13.5px;font-weight:600;color:var(--rvt-gold-400);text-decoration:none}
+.docs-link:hover{text-decoration:underline}
+.hint{font-size:12px;color:var(--rvt-black-300)}
+
+/* ---------- good to know ---------- */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--rvt-space-md)}
+.info{border:1px solid var(--line);border-radius:16px;padding:var(--rvt-space-md);background:var(--glass);transition:.25s}
+.info:hover{transform:translateY(-4px);border-color:rgba(255,193,50,.45)}
+.info .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:20px;margin-bottom:14px;
+ background:rgba(153,0,0,.18);box-shadow:inset 0 0 0 1px rgba(255,99,106,.3)}
+.info:nth-child(even) .ico{background:rgba(0,98,152,.2);box-shadow:inset 0 0 0 1px rgba(99,177,211,.35)}
+.info b{font-family:var(--font-display);font-size:15.5px;display:block;margin-bottom:6px}
+.info p{font-size:13.3px;color:var(--muted)}
+.info a{color:var(--rvt-gold-400);text-decoration:none}
+.info a:hover{text-decoration:underline}
+
+/* ---------- CTA + footer ---------- */
+.cta-band{border-radius:28px;padding:var(--rvt-space-3xl) var(--rvt-space-xl);text-align:center;position:relative;overflow:hidden;
+ background:linear-gradient(135deg,rgba(153,0,0,.6),rgba(14,24,37,.92) 55%,rgba(0,98,152,.5));
+ border:1px solid rgba(255,255,255,.14)}
+.cta-band::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 200px at 20% 0%,rgba(255,193,50,.25),transparent 60%);pointer-events:none}
+.cta-band .trident-tab{display:inline-grid;width:56px;height:56px;margin-bottom:22px}
+.cta-band .trident-tab svg{width:26px;height:31px}
+.cta-band h2{margin-bottom:14px}
+.cta-band p{color:#c9d4dd;max-width:580px;margin:0 auto 34px;position:relative}
+footer{border-top:1px solid var(--line);padding:var(--rvt-space-xxl) 0 46px;margin-top:96px}
+.foot{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;font-size:13.5px;color:var(--muted)}
+.foot h5{font-family:var(--font-display);color:#fff;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.foot a{display:block;color:var(--muted);text-decoration:none;margin-bottom:9px;transition:color .2s}
+.foot a:hover{color:var(--rvt-gold-400)}
+.foot .fine{margin-top:10px;font-size:12px;opacity:.7;max-width:280px}
+
+@media(max-width:960px){
+  .pillars,.qs-grid,.ucs{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr 1fr;gap:40px 10px}
+  .flow-arrow{display:none}
+  .nav-links{display:none}
+}
+@media(max-width:540px){.flow{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+
+<svg style="display:none">
+  <symbol id="iu-trident" viewBox="0 0 28 34">
+    <path d="M-3.34344e-05 4.70897H8.83308V7.174H7.1897V21.1426H10.6134V2.72321H8.83308V0.121224H18.214V2.65476H16.2283V21.1426H19.7889V7.174H18.214V4.64047H27.0471V7.174H25.0614V23.6761L21.7746 26.8944H16.2967V30.455H18.214V33.8787H8.76463V30.592H10.6819V26.8259H5.20403L1.91726 23.6077V7.174H-3.34344e-05V4.70897Z" fill="currentColor"></path>
+  </symbol>
+  <symbol id="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m-6-7 7 7-7 7"></path></symbol>
+</svg>
+
+<nav>
+  <div class="wrap nav-inner">
+    <a class="lockup" href="#top">
+      <span class="trident-tab"><svg><use href="#iu-trident"></use></svg></span>
+      <span class="lockup-body">
+        <span class="lockup-title">REALLMS</span>
+        <span class="lockup-sub">Indiana University</span>
+      </span>
+    </a>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#access">Get Access</a>
+      <a href="#usecases">Use Cases</a>
+      <a href="#models">Models</a>
+      <a href="#quickstart">IDE Setup</a>
+    </div>
+    <a class="btn btn-primary" href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">Launch REALLMS Chat →</a>
+  </div>
+</nav>
+
+<header id="top">
+  <div class="wrap">
+    <div class="pill reveal"><span class="dot"></span>Research &amp; Academic LLM Services</div>
+    <h1 class="reveal">LLMs on IU hardware.<br><span class="grad">Free. On-prem. Yours to build on.</span></h1>
+    <p class="hero-sub reveal">REALLMS is IU's large-language model service — <b>provided at no fee to the IU
+      community</b>, with all hardware running on premises in the IU Data Center. Talk to curated models in the
+      browser with <b>REALLMS Chat</b>, or wire them into your research and teaching stack with the
+      <b>REALLMS API</b>. Operated by UITS Research Technologies.</p>
+    <div class="hero-ctas reveal">
+      <a class="btn btn-primary" href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">💬 &nbsp;Open REALLMS Chat</a>
+      <a class="btn btn-gold" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">⚙ &nbsp;Explore the REALLMS API</a>
+      <a class="btn btn-ghost" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener">Read the overview (KB0026671)</a>
+    </div>
+    <div class="hero-stats reveal">
+      <div class="stat"><b>$0</b><span>no fee, for all of IU</span></div>
+      <div class="stat"><b>On-prem</b><span>IU Data Center hardware</span></div>
+      <div class="stat"><b>7</b><span>curated models · chat, embed, rerank</span></div>
+      <div class="stat"><b>PHI-ready</b><span>approved for Critical research data</span></div>
+    </div>
+  </div>
+</header>
+
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Two core services</div>
+      <h2>Pick your interface.</h2>
+      <p class="lead">REALLMS ships as two components built on the same on-prem infrastructure:
+        Open&nbsp;WebUI + vLLM for chatting, LiteLLM + vLLM for programmatic access.</p>
+    </div>
+    <div class="pillars">
+      <div class="pillar chat reveal">
+        <div class="p-top">
+          <div class="p-icon">💬</div>
+          <div class="p-stack">
+            <span class="p-tag">Open WebUI · vLLM</span>
+            <span class="free-flag">FREE · IU account</span>
+          </div>
+        </div>
+        <h3>REALLMS Chat</h3>
+        <p>A web-based chat service on the Open&nbsp;WebUI platform with a vLLM back end. Anyone with
+          an IU account can use it — no separate account, no request, no keys.</p>
+        <ul class="feat-mini">
+          <li><span class="tick">✓</span>Switch between curated models per chat</li>
+          <li><span class="tick">✓</span>Save multiple chats · upload documents for context</li>
+          <li><span class="tick">✓</span>Generate images · organize chats with folders</li>
+          <li><span class="tick">✓</span>Knowledge collections — share sources with groups, connect Google&nbsp;Drive / OneDrive</li>
+        </ul>
+        <div class="p-meta"><span class="lbl">URL</span> reallms.rescloud.iu.edu</div>
+        <div class="p-links">
+          <a class="chip" href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">Open the chat ↗</a>
+          <a class="chip" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener">Overview · KB0026671</a>
+        </div>
+      </div>
+      <div class="pillar api reveal">
+        <div class="p-top">
+          <div class="p-icon">⚙️</div>
+          <div class="p-stack">
+            <span class="p-tag">LiteLLM · vLLM</span>
+            <span class="beta">BETA</span>
+          </div>
+        </div>
+        <h3>REALLMS API</h3>
+        <p>OpenAI-compatible endpoints for IU researchers, faculty, and staff to integrate LLMs into
+          workflows and services — at no cost. LiteLLM routes requests; vLLM serves and manages the
+          models, all in the IU Data Center.</p>
+        <ul class="feat-mini">
+          <li><span class="tick">✓</span><code style="font-family:var(--font-mono);font-size:12px">/chat/completions</code>, <code style="font-family:var(--font-mono);font-size:12px">/completions</code>, <code style="font-family:var(--font-mono);font-size:12px">/embeddings</code>, <code style="font-family:var(--font-mono);font-size:12px">/rerank</code></li>
+          <li><span class="tick">✓</span>API keys issued per-person via RT Projects allocations</li>
+          <li><span class="tick">✓</span>Data sent to the API is not stored by the service</li>
+          <li><span class="tick">✓</span>Ideal for IDEs, coding agents, harnesses &amp; pipelines</li>
+        </ul>
+        <div class="p-meta"><span class="lbl">Base URL</span> reallms.rescloud.iu.edu/direct/v1</div>
+        <div class="p-links">
+          <a class="chip" href="https://projects.rt.iu.edu" target="_blank" rel="noopener">Get a key · RT Projects ↗</a>
+          <a class="chip" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">API docs · KB0027272</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="access">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Get an API key</div>
+      <h2>RT Projects → allocation → your key.</h2>
+      <p class="lead">API access is a Research Technologies resource requested through
+        <a href="https://projects.rt.iu.edu" target="_blank" rel="noopener">RT Projects</a>. Full walkthrough:
+        <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" target="_blank" rel="noopener">Use RT Projects to request and manage access to specialized RT resources (KB0024132)</a>.</p>
+    </div>
+    <div class="flow reveal">
+      <div class="flow-step">
+        <div class="flow-node">📁<span class="flow-num">1</span>
+          <svg class="flow-arrow"><use href="#arr"></use></svg>
+        </div>
+        <h4>Create a project</h4>
+        <p>Start a project in <a class="a" href="https://projects.rt.iu.edu" target="_blank" rel="noopener">RT Projects</a> describing your research or academic work.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-node">📨<span class="flow-num">2</span>
+          <svg class="flow-arrow"><use href="#arr"></use></svg>
+        </div>
+        <h4>Request an allocation</h4>
+        <p>Add a REALLMS API allocation request to the project. <a class="a" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" target="_blank" rel="noopener">How-to →</a></p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-node">✅<span class="flow-num">3</span>
+          <svg class="flow-arrow"><use href="#arr"></use></svg>
+        </div>
+        <h4>Allocation approved</h4>
+        <p>Once RT approves it, your allocation becomes active with its own page.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-node">🔑<span class="flow-num">4</span>
+          <svg class="flow-arrow"><use href="#arr"></use></svg>
+        </div>
+        <h4>Create your API key</h4>
+        <p>Visit the allocation page and create a key. Keys are owned by you — teammates get added to the project/allocation, then make their own.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-node"><span class="trident-tab"><svg><use href="#iu-trident"></use></svg></span><span class="flow-num">5</span></div>
+        <h4>Call the API</h4>
+        <p>Point your code at the OpenAI-compatible endpoint — details in <a class="a" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">KB0027272</a>.</p>
+      </div>
+    </div>
+    <div class="flow-note reveal">
+      <span style="font-size:20px">💡</span>
+      <span>Just here to chat? Skip the whole flow — <b>REALLMS Chat</b> works today with any IU account.
+      The RT Projects allocation applies only to <b>programmatic API access</b>. Manage, extend, or renew
+      allocations anytime in <a href="https://projects.rt.iu.edu" target="_blank" rel="noopener">RT Projects</a>.</span>
+    </div>
+  </div>
+</section>
+
+<section id="usecases">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Use cases</div>
+      <h2>Two services, many workflows.</h2>
+    </div>
+    <div class="ucs">
+      <div class="uc uc-chat reveal">
+        <span class="uc-badge">Chat · Open WebUI</span>
+        <h3>Talk to curated models, right now</h3>
+        <p>Interactive Q&amp;A, analysis, document chat, and image generation at
+          <a href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">reallms.rescloud.iu.edu</a>.</p>
+        <div class="chatmock">
+          <div class="bar"><i class="f1"></i><i class="f2"></i><i class="f3"></i><span>REALLMS Chat — Open WebUI</span></div>
+          <div class="bubble b-user">Summarize the risks of using an LLM to screen literature review abstracts.</div>
+          <div class="bubble b-bot"><span class="who">GLM 5.2</span>Key risks include hallucinated findings, citation errors, and systematic bias toward familiar terminology…</div>
+          <div class="bubble b-bot"><span class="who">GPT OSS 120B</span><span class="typing"><i></i><i></i><i></i></span></div>
+          <div class="mock-input">Message REALLMS Chat… <span class="model-pick">Qwen3 Coder Next ▾</span></div>
+        </div>
+        <ul class="uc-list" style="margin-top:var(--rvt-space-md)">
+          <li><span class="tick">✓</span>Compare model behavior for teaching or pilot studies</li>
+          <li><span class="tick">✓</span>Upload PDFs &amp; builds shareable knowledge collections</li>
+          <li><span class="tick">✓</span>Approved for Critical research data and PHI (DM-01)</li>
+        </ul>
+      </div>
+      <div class="uc uc-api reveal">
+        <span class="uc-badge">API · LiteLLM + vLLM</span>
+        <h3>Put models inside your workflow</h3>
+        <p>OpenAI-compatible HTTP endpoints + personal keys from
+          <a href="https://projects.rt.iu.edu" target="_blank" rel="noopener">RT Projects</a> allocations.</p>
+        <div class="term">
+          <div><span class="prompt">$</span> curl https://reallms.rescloud.iu.edu/direct/v1/<span class="url">models</span> \</div>
+          <div>&nbsp;&nbsp;-H <span class="key">"Authorization: Bearer &lt;API-KEY&gt;"</span></div>
+          <div><span class="out">{"data": [</span></div>
+          <div><span class="out">&nbsp;&nbsp;{</span><span class="m">"id": "gemma-4-31B-it"</span><span class="out">}, {</span><span class="m">"id": "glm-5.2"</span><span class="out">},</span></div>
+          <div><span class="out">&nbsp;&nbsp;{</span><span class="m">"id": "gpt-oss-120b"</span><span class="out">}, {</span><span class="m">"id": "Qwen3-Coder-Next"</span><span class="out">}, …</span></div>
+          <div><span class="out">]}</span></div>
+          <div>&nbsp;</div>
+          <div><span class="prompt">$</span> curl -X POST https://reallms.rescloud.iu.edu/direct/v1/<span class="url">chat/completions</span> \</div>
+          <div>&nbsp;&nbsp;-H <span class="key">"Authorization: Bearer &lt;API-KEY&gt;"</span> -H <span class="key">"Content-Type: application/json"</span> \</div>
+          <div>&nbsp;&nbsp;-d <span class="key">'{"model": "gemma-4-31B-it", "messages":[{"role":"user",</span></div>
+          <div><span class="key">&nbsp;&nbsp;&nbsp;"content":"Why is the sky blue?"}]}'</span></div>
+        </div>
+        <ul class="uc-list" style="margin-top:var(--rvt-space-md)">
+          <li><span class="tick">✓</span><b>IDE copilots &amp; coding agents</b> — Codex CLI, opencode, and any OpenAI-compatible tool</li>
+          <li><span class="tick">✓</span><b>Agent harnesses &amp; evals</b> — batch prompts, benchmarks, reproducible research</li>
+          <li><span class="tick">✓</span><b>RAG pipelines</b> — Qwen3 embeddings + Qwen3 reranker on the same base URL</li>
+          <li><span class="tick">✓</span><b>Data not stored</b> — API payloads aren't persisted by the service</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="models">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Curated models</div>
+      <h2>The current lineup — by model type.</h2>
+      <p class="lead">UITS-RT curates the selection and reviews it regularly. Chat exposes four instruct
+        models; the API adds embeddings and reranking. Switch the service and type filters below.</p>
+    </div>
+    <div class="model-bar reveal">
+      <div class="filters" id="filters">
+        <button class="fbtn active" data-f="all">All types</button>
+        <button class="fbtn" data-f="chat">Chat / completion</button>
+        <button class="fbtn" data-f="embeddings">Embeddings</button>
+        <button class="fbtn" data-f="rerank">Rerank</button>
+        <button class="fbtn" data-f="coding">Coding</button>
+        <button class="fbtn" data-f="long">128K+ context</button>
+      </div>
+      <div class="svc-toggle" id="svcToggle">
+        <button class="on" data-svc="chat">In REALLMS Chat</button>
+        <button data-svc="api">In REALLMS API</button>
+      </div>
+    </div>
+    <div class="model-grid reveal" id="modelGrid"></div>
+    <p class="models-note reveal" id="modelCount"></p>
+
+    <div class="ep-grid reveal">
+      <div class="ep">
+        <code>GET /models</code>
+        <div class="desc">List everything your key can reach</div>
+        <ul><li>all allocated models</li></ul>
+      </div>
+      <div class="ep">
+        <code>POST /chat/completions</code>
+        <div class="desc">Messages, agents, harnesses</div>
+        <ul><li>gemma-4-31B-it</li><li>glm-5.2</li><li>gpt-oss-120b</li><li>Qwen3-Coder-Next</li></ul>
+      </div>
+      <div class="ep">
+        <code>POST /completions</code>
+        <div class="desc">Raw text completion</div>
+        <ul><li>gemma-4-31B-it</li><li>glm-5.2</li><li>gpt-oss-120b</li><li>Qwen3-Coder-Next</li></ul>
+      </div>
+      <div class="ep">
+        <code>POST /embeddings</code>
+        <div class="desc">Vectors for search &amp; RAG</div>
+        <ul><li>Qwen3-Embedding-8B</li><li>embeddinggemma-300m</li></ul>
+      </div>
+      <div class="ep">
+        <code>POST /rerank</code>
+        <div class="desc">Re-rank retrieved passages</div>
+        <ul><li>Qwen3-Reranker-8B</li></ul>
+      </div>
+    </div>
+    <p class="models-note reveal">Availability, versions, and model names change — the authoritative current
+      list is <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">KB0027272</a>.
+      Want a model added? Use the <b>REALLMS Model Request Form</b> (linked from that article).</p>
+  </div>
+</section>
+
+<section id="quickstart">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="eyebrow">Bring your tools</div>
+      <h2>Wire REALLMS into your IDE or harness.</h2>
+      <p class="lead" style="text-align:center">The API is OpenAI-compatible, so set the base URL, add your
+        RT Projects key, and pick a model ID from <span class="inlinecode">/models</span>. Working examples for
+        today's most popular agentic coding tools:</p>
+    </div>
+    <div class="qs-url reveal">
+      <span class="lbl">Base URL</span>
+      <code id="apiBase">https://reallms.rescloud.iu.edu/direct/v1</code>
+      <button class="btn btn-ghost copy" onclick="navigator.clipboard.writeText(document.getElementById('apiBase').innerText);this.textContent='Copied ✓'">Copy</button>
+    </div>
+    <div class="qs-grid">
+      <div class="tool-card codex reveal">
+        <div class="tool-head">
+          <div class="tool-logo">&gt;_</div>
+          <div><h3>Codex CLI</h3><span>custom provider via a model_profile in config.toml</span></div>
+        </div>
+        <div class="tool-body">
+          <p>Add a REALLMS profile to <span class="inlinecode">~/.codex/config.toml</span>, export your key, then run with the profile.</p>
+          <div class="code">
+            <div class="code-bar"><i class="f1"></i><i class="f2"></i><i class="f3"></i><span class="file">~/.codex/config.toml</span></div>
+            <pre><span class="c"># use: codex --profile reallms</span>
+model_provider = <span class="s">"reallms"</span>
+model          = <span class="s">"Qwen3-Coder-Next"</span>  <span class="c"># /models for IDs</span>
+
+<span class="k">[model_providers.reallms]</span>
+name     = <span class="s">"IU REALLMS"</span>
+base_url = <span class="s">"https://reallms.rescloud.iu.edu/direct/v1"</span>
+env_key  = <span class="s">"REALLMS_API_KEY"</span>
+wire_api = <span class="s">"chat"</span></pre>
+          </div>
+          <div class="code">
+            <div class="code-bar"><i class="f1"></i><i class="f2"></i><i class="f3"></i><span class="file">terminal</span></div>
+            <pre><span class="k">export</span> REALLMS_API_KEY=<span class="s">"&lt;your RT Projects key&gt;"</span>
+codex <span class="s">"refactor the test suite to pytest"</span></pre>
+          </div>
+          <p class="hint">Prefer a second provider? Keep your OpenAI default and pass
+            <span class="inlinecode">--profile</span> / <span class="inlinecode">--config model_provider=reallms</span> per run. See the
+            <a class="docs-link" style="display:inline" href="https://developers.openai.com/codex/config/" target="_blank" rel="noopener">Codex config reference ↗</a></p>
+          <a class="docs-link" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">REALLMS API reference (KB0027272) →</a>
+        </div>
+      </div>
+      <div class="tool-card oc reveal">
+        <div class="tool-head">
+          <div class="tool-logo">⌨</div>
+          <div><h3>opencode</h3><span>custom OpenAI-compatible provider in opencode.json</span></div>
+        </div>
+        <div class="tool-body">
+          <p>Declare REALLMS as a provider using <span class="inlinecode">@ai-sdk/openai-compatible</span>.
+            Store the key with <span class="inlinecode">/connect</span>, or read it from the environment as shown.</p>
+          <div class="code">
+            <div class="code-bar"><i class="f1"></i><i class="f2"></i><i class="f3"></i><span class="file">opencode.json</span></div>
+            <pre>{
+  <span class="k">"$schema"</span>: <span class="s">"https://opencode.ai/config.json"</span>,
+  <span class="k">"model"</span>: <span class="s">"iu-reallms/Qwen3-Coder-Next"</span>,
+  <span class="k">"provider"</span>: {
+    <span class="k">"iu-reallms"</span>: {
+      <span class="k">"npm"</span>: <span class="s">"@ai-sdk/openai-compatible"</span>,
+      <span class="k">"name"</span>: <span class="s">"IU REALLMS"</span>,
+      <span class="k">"options"</span>: {
+        <span class="k">"baseURL"</span>:
+          <span class="s">"https://reallms.rescloud.iu.edu/direct/v1"</span>,
+        <span class="k">"apiKey"</span>: <span class="s">"{env:REALLMS_API_KEY}"</span>
+      },
+      <span class="k">"models"</span>: {
+        <span class="k">"Qwen3-Coder-Next"</span>: { <span class="k">"name"</span>: <span class="s">"Qwen3 Coder Next"</span> },
+        <span class="k">"glm-5.2"</span>:           { <span class="k">"name"</span>: <span class="s">"GLM 5.2"</span> },
+        <span class="k">"gemma-4-31B-it"</span>:    { <span class="k">"name"</span>: <span class="s">"Gemma4 31B"</span> },
+        <span class="k">"gpt-oss-120b"</span>:      { <span class="k">"name"</span>: <span class="s">"GPT OSS 120B"</span> }
+      }
+    }
+  }
+}</pre>
+          </div>
+          <div class="code">
+            <div class="code-bar"><i class="f1"></i><i class="f2"></i><i class="f3"></i><span class="file">terminal</span></div>
+            <pre><span class="k">export</span> REALLMS_API_KEY=<span class="s">"&lt;your RT Projects key&gt;"</span>
+opencode
+<span class="c"># inside the TUI:  /models → iu-reallms/*</span></pre>
+          </div>
+          <p class="hint">Full walkthrough:
+            <a class="docs-link" style="display:inline" href="https://opencode.ai/docs/providers/#custom-provider" target="_blank" rel="noopener">opencode custom provider docs ↗</a></p>
+          <a class="docs-link" href="https://projects.rt.iu.edu" target="_blank" rel="noopener">No key yet? Request via RT Projects →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="good">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Good to know</div>
+      <h2>Built for research use.</h2>
+    </div>
+    <div class="info-grid">
+      <div class="info reveal"><div class="ico">🔒</div><b>Approved for PHI</b>
+        <p>Both services are approved for <b>Critical research data</b> and <b>PHI</b> under
+        <a href="https://policyweb.iu.edu/url?q=/ui/display/DM/DM-01" target="_blank" rel="noopener">DM-01</a>.
+        Questions on data sensitivity? Email the Data Steward for Research Data (datard@iu.edu).</p></div>
+      <div class="info reveal"><div class="ico">🗂️</div><b>Chats stay in the browser app</b>
+        <p>Chat conversations are kept in the web app for persistence and aren't used for internal analysis.
+        Temporary chats aren't stored, and data sent to the API is not stored.</p></div>
+      <div class="info reveal"><div class="ico">📉</div><b>Model lifecycle</b>
+        <p>One long-term supported general-purpose model gets ≥3 months' removal notice; all others get 30 days.
+        Need a specific model? Use the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">REALLMS Model Request Form</a>.</p></div>
+      <div class="info reveal"><div class="ico">⚡</div><b>High-throughput jobs</b>
+        <p>The API is a shared resource; heavy use may be rate-limited. For big batches, UITS recommends
+        <b>HPC LLMs</b> on IU's research supercomputers.</p></div>
+      <div class="info reveal"><div class="ico">🔧</div><b>Maintenance &amp; uptime</b>
+        <p>Generally available 24×7 on scheduled maintenance (second Sunday monthly, 7am–7pm ET) with
+        minimal downtime. API is in <b>beta</b> — expect occasional unexpected downtime and change.</p></div>
+      <div class="info reveal"><div class="ico">💬</div><b>Help &amp; community</b>
+        <p>Ask in the IU HPC and AI User Community Slack <b>#reallms</b> channel, or reach the UITS REALLMS
+        team via the <a href="https://projects.rt.iu.edu/help/?queue=racs" target="_blank" rel="noopener">REALLMS contact form</a>
+        (Mon–Fri, 8am–5pm ET).</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band reveal">
+      <span class="trident-tab"><svg><use href="#iu-trident"></use></svg></span>
+      <div class="pill" style="margin-bottom:22px"><span class="dot"></span>Free for the IU community</div>
+      <h2>Start with REALLMS today.</h2>
+      <p>Chat is one IU Login away. API access is one RT Projects request away.</p>
+      <div class="hero-ctas" style="margin-top:0">
+        <a class="btn btn-primary" href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">Open REALLMS Chat</a>
+        <a class="btn btn-gold" href="https://projects.rt.iu.edu" target="_blank" rel="noopener">Request API access</a>
+        <a class="btn btn-ghost" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener">REALLMS overview</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <a class="lockup" href="#top" style="margin-bottom:16px">
+        <span class="trident-tab"><svg><use href="#iu-trident"></use></svg></span>
+        <span class="lockup-body">
+          <span class="lockup-title">REALLMS</span>
+          <span class="lockup-sub">Indiana University</span>
+        </span>
+      </a>
+      <p style="max-width:280px">Research and Academic LLM Services — UITS Research Technologies, on premises in the IU Data Center.</p>
+      <p class="fine">Community-made landing page. The KB articles and Terms of Service are the authoritative source.</p>
+    </div>
+    <div>
+      <h5>Services</h5>
+      <a href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">REALLMS Chat</a>
+      <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">REALLMS API · KB0027272</a>
+      <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" target="_blank" rel="noopener">REALLMS overview · KB0026671</a>
+    </div>
+    <div>
+      <h5>Access &amp; support</h5>
+      <a href="https://projects.rt.iu.edu" target="_blank" rel="noopener">RT Projects</a>
+      <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" target="_blank" rel="noopener">RT Projects how-to · KB0024132</a>
+      <a href="https://projects.rt.iu.edu/help/?queue=racs" target="_blank" rel="noopener">REALLMS contact form</a>
+    </div>
+    <div>
+      <h5>Tooling docs</h5>
+      <a href="https://developers.openai.com/codex/config/" target="_blank" rel="noopener">Codex CLI config</a>
+      <a href="https://opencode.ai/docs/providers/#custom-provider" target="_blank" rel="noopener">opencode custom providers</a>
+      <a href="https://policyweb.iu.edu/url?q=/ui/display/DM/DM-01" target="_blank" rel="noopener">IU policy DM-01</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const MODELS=[
+ {name:"Gemma4 31B", id:"gemma-4-31B-it", fam:"Google", ctx:"256K", tt:"BF16", chat:true, api:["chat","completions"], tags:["long"], c:"#FFC132"},
+ {name:"GLM 5.2", id:"glm-5.2", fam:"Zhipu AI", ctx:"256K", tt:"FP8", chat:true, api:["chat","completions"], tags:["long"], c:"#63B1D3"},
+ {name:"GPT OSS 120B", id:"gpt-oss-120b", fam:"OpenAI", ctx:"128K", tt:"BF16+UB", chat:true, api:["chat","completions"], tags:["long"], c:"#328BB8"},
+ {name:"Qwen3 Coder Next", id:"Qwen3-Coder-Next", fam:"Alibaba", ctx:"256K", tt:"FP8", chat:true, api:["chat","completions"], tags:["long","coding"], c:"#FF7E60"},
+ {name:"Qwen3 Embedding 8B", id:"Qwen3-Embedding-8B", fam:"Alibaba", ctx:"—", tt:"", chat:false, api:["embeddings"], tags:["embeddings"], c:"#63B363"},
+ {name:"EmbeddingGemma 300m", id:"embeddinggemma-300m", fam:"Google", ctx:"—", tt:"", chat:false, api:["embeddings"], tags:["embeddings"], c:"#63B363"},
+ {name:"Qwen3 Reranker 8B", id:"Qwen3-Reranker-8B", fam:"Alibaba", ctx:"—", tt:"", chat:false, api:["rerank"], tags:["rerank"], c:"#A07498"}
+];
+let svc="chat", filt="all";
+const grid=document.getElementById('modelGrid'), count=document.getElementById('modelCount');
+function matches(m){
+  if(svc==="chat" && !m.chat) return false;
+  if(svc==="api" && m.api.length===0) return false;
+  if(filt==="all") return true;
+  if(filt==="chat") return m.api.includes("chat")||m.api.includes("completions");
+  if(filt==="embeddings") return m.api.includes("embeddings");
+  if(filt==="rerank") return m.api.includes("rerank");
+  return m.tags.includes(filt);
+}
+function render(){
+  const list=MODELS.filter(matches);
+  grid.innerHTML=list.map(m=>{
+    const chips=[
+      m.ctx!=="—" ? `<span class="mtag ctx">${m.ctx} context</span>`:"",
+      m.tt ? `<span class="mtag tt">${m.tt}</span>`:"",
+      ...m.tags.filter(t=>t!=="long").map(t=>`<span class="mtag">${t==="coding"?"coding":"type: "+t}</span>`),
+      m.api.includes("chat")?'<span class="mtag">chat</span>':"",
+      m.api.includes("completions")?'<span class="mtag">completions</span>':"",
+      m.api.includes("embeddings")?'<span class="mtag">embeddings</span>':"",
+      m.api.includes("rerank")?'<span class="mtag">rerank</span>':""
+    ].join("");
+    return `<div class="mcard" style="--accent:${m.c}">
+      <div class="fam">${m.fam}${m.chat?" · in Chat":""}</div><b>${m.name}</b>
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--rvt-black-300);margin-top:6px">${m.id}</div>
+      <div class="mspecs">${chips}</div></div>`;
+  }).join("");
+  const total=MODELS.length, avail=MODELS.filter(m=>svc==="chat"?m.chat:m.api.length>0).length;
+  count.innerHTML=`Showing <b style="color:var(--text)">${list.length}</b> of <b style="color:var(--text)">${avail}</b> ${svc==="chat"?"chat":"API-served"} models
+   (${total} curated total). Model IDs as returned by <code style="font-family:var(--font-mono)">/models</code>.`;
+}
+render();
+document.getElementById('filters').addEventListener('click',e=>{
+  const b=e.target.closest('.fbtn'); if(!b) return;
+  document.querySelectorAll('#filters .fbtn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); filt=b.dataset.f; render();
+});
+document.getElementById('svcToggle').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#svcToggle button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); svc=b.dataset.svc; render();
+});
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

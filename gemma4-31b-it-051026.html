@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REALLMS | Research and Academic LLM Services at IU</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@iu-rivet/dist@latest/css/rivet.css">
+    <style>
+        :root {
+            --iu-crimson: #990000;
+            --iu-crimson-dark: #7a0000;
+        }
+        body { font-family: var(--rvt-font-sans); }
+        .flow-section { padding: 5rem 0; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #990000 0%, #4d0000 100%);
+            color: white !important;
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+        }
+        .process-step { 
+            border-left: 4px solid var(--iu-crimson); 
+            padding-left: 1.5rem; 
+            margin-bottom: 2.5rem; 
+            position: relative; 
+        }
+        .process-step::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--iu-crimson);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(153, 0, 0, 0.2);
+        }
+        .visual-flow {
+            background: white;
+            border: 2px solid #eee;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 3rem;
+            border-radius: 1rem;
+        }
+        .flow-badge {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            color: white;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Section: High Impact -->
+    <div class="rvt-hero gradient-bg">
+        <div class="rvt-container-lg">
+            <div class="rvt-hero__inner">
+                <div class="rvt-hero__body rvt-flow">
+                    <span class="rvt-hero__eyebrow rvt-color-white" style="color: rgba(255,255,255,0.8)">Indiana University</span>
+                    <h1 class="rvt-hero__title rvt-color-white">The Future of Research is Here.</h1>
+                    <div class="rvt-hero__teaser">
+                        <p style="color: rgba(255,255,255,0.9); font-size: 1.25rem;">REALLMS provides secure, industrial-grade access to the world's most powerful Large Language Models for the IU community.</p>
+                    </div>
+                    <div class="rvt-hero__actions">
+                        <a class="rvt-cta rvt-cta--button rvt-bg-white rvt-color-crimson" href="https://reallms.rescloud.iu.edu" style="font-weight: bold;">Launch REALLMS Chat</a>
+                    </div>
+                </div>
+                <div class="rvt-hero__media">
+                    <img src="https://rivet.iu.edu/img/placeholder/hero-2.webp" alt="Abstract AI visualization" style="border-radius: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Major Components: Grid Cards -->
+    <section class="flow-section">
+        <div class="rvt-container-lg">
+            <div class="rvt-row">
+                <div class="rvt-cols-6-md">
+                    <div class="rvt-card rvt-card--raised card-hover">
+                        <div class="rvt-card__body">
+                            <div class="rvt-card__eyebrow rvt-color-crimson rvt-text-bold">Instant Access</div>
+                            <h2 class="rvt-card__title">REALLMS Chat</h2>
+                            <div class="rvt-card__content rvt-flow">
+                                <p>The immediate gateway to AI. A secure web interface to experiment, prototype, and collaborate with leading LLMs without any setup.</p>
+                                <a class="rvt-button" href="https://reallms.rescloud.iu.edu">Start Chatting</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rvt-cols-6-md">
+                    <div class="rvt-card rvt-card--raised card-hover">
+                        <div class="rvt-card__body">
+                            <div class="rvt-card__eyebrow rvt-color-crimson rvt-text-bold">Developer Grade</div>
+                            <h2 class="rvt-card__title">REALLMS API</h2>
+                            <div class="rvt-card__content rvt-flow">
+                                <p>Unlock programmatic power. Integrate state-of-the-art models into your research pipelines, custom apps, and autonomous agents.</p>
+                                <a class="rvt-button rvt-button--secondary" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272">Explore API Docs</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases: Visual Icons/Cards -->
+    <section class="flow-section rvt-bg-black-100">
+        <div class="rvt-container-lg">
+            <h2 class="rvt-text-center rvt-ts-41 rvt-text-bold" style="margin-bottom: 3rem;">Empowering Every Workflow</h2>
+            <div class="rvt-row">
+                <div class="rvt-cols-4-md">
+                    <div class="rvt-card rvt-card--raised card-hover" style="height: 100%;">
+                        <div class="rvt-card__body">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">💬</div>
+                            <h3 class="rvt-card__title">Conversational AI</h3>
+                            <p>Perfect for summarizing academic literature, rapid prototyping of prompts, and complex brainstorming sessions.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rvt-cols-4-md">
+                    <div class="rvt-card rvt-card--raised card-hover" style="height: 100%;">
+                        <div class="rvt-card__body">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">⚙️</div>
+                            <h3 class="rvt-card__title">Custom Integration</h3>
+                            <p>Build specialized tools for your lab. Use the API to automate data analysis and generate synthetic datasets at scale.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rvt-cols-4-md">
+                    <div class="rvt-card rvt-card--raised card-hover" style="height: 100%;">
+                        <div class="rvt-card__body">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">🤖</div>
+                            <h3 class="rvt-card__title">Agents & IDEs</h3>
+                            <p>Supercharge your dev environment. Connect to VS Code or build autonomous agents that plan and execute research tasks.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Allocation Process: Visual & Step-by-step -->
+    <section class="flow-section">
+        <div class="rvt-container-lg">
+            <div class="rvt-row">
+                <div class="rvt-cols-6-md">
+                    <h2 class="rvt-ts-32 rvt-text-bold" style="margin-bottom: 1.5rem;">Get Started with the API</h2>
+                    <p class="rvt-ts-18" style="margin-bottom: 2.5rem;">The REALLMS API is delivered through the RT Projects system to ensure secure and accountable resource allocation.</p>
+                    
+                    <div class="process-step">
+                        <strong class="rvt-text-bold rvt-color-crimson">STEP 1: RT Project Setup</strong><br>
+                        Launch your journey at the <a href="https://projects.rt.iu.edu" class="rvt-color-blue">RT Projects Portal</a>. Create a project or join an existing one.
+                    </div>
+                    <div class="process-step">
+                        <strong class="rvt-text-bold rvt-color-crimson">STEP 2: Resource Request</strong><br>
+                        Apply for REALLMS API allocation within your project settings. This ensures you have the necessary quota.
+                    </div>
+                    <div class="process-step">
+                        <strong class="rvt-text-bold rvt-color-crimson">STEP 3: Integration</strong><br>
+                        Retrieve your secure keys and connect your application. Check the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" class="rvt-color-blue">RT Setup Guide</a>.
+                    </div>
+                </div>
+                <div class="rvt-cols-6-md">
+                    <div class="visual-flow rvt-text-center">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+                            <div class="flow-badge rvt-bg-black">RT PROJECT</div>
+                            <div style="font-size: 1.5rem; color: #ccc;">↓</div>
+                            <div class="flow-badge rvt-bg-crimson">RESOURCE APPROVAL</div>
+                            <div style="font-size: 1.5rem; color: #ccc;">↓</div>
+                            <div class="flow-badge" style="background: #ffaa00;">API KEY ISSUANCE</div>
+                            <div style="font-size: 1.5rem; color: #ccc;">↓</div>
+                            <div class="flow-badge rvt-bg-blue">LLM ACCESS</div>
+                        </div>
+                        <p style="margin-top: 2rem; font-style: italic; color: #666;">The Path to API Activation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Models Section: Modern Table -->
+    <section class="flow-section rvt-bg-black-100">
+        <div class="rvt-container-lg">
+            <h2 class="rvt-text-center rvt-ts-41 rvt-text-bold" style="margin-bottom: 3rem;">Available Intelligence</h2>
+            <div class="rvt-table-responsive">
+                <table class="rvt-table rvt-table-stripes rvt-card--raised">
+                    <thead style="background: var(--iu-crimson); color: white;">
+                        <tr>
+                            <th scope="col" style="color: white;">Model Family</th>
+                            <th scope="col" style="color: white;">Variants</th>
+                            <th scope="col" style="color: white;">Primary Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Llama 3</th>
+                            <td>8B, 70B</td>
+                            <td>State-of-the-art general performance and open-weights versatility.</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Mistral / Mixtral</th>
+                            <td>Mistral-7B, Mixtral-8x7B</td>
+                            <td>Exceptional reasoning, coding proficiency, and multilingual support.</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Gemma</th>
+                            <td>2B, 7B, 27B</td>
+                            <td>Google's research-grade lightweight models for high-efficiency tasks.</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Custom</th>
+                            <td>Domain Specific</td>
+                            <td>Specialized weights for targeted academic research.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="rvt-text-center" style="margin-top: 2rem;">
+                <a class="rvt-cta rvt-cta--plain rvt-color-crimson rvt-text-bold" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272">View Full Model Catalog →</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="rvt-flow rvt-bg-black rvt-color-white" style="padding: 4rem 0; text-align: center;">
+        <div class="rvt-container-lg">
+            <div style="margin-bottom: 1rem; font-weight: bold; font-size: 1.2rem;">Indiana University</div>
+            <p style="color: rgba(255,255,255,0.6)">&copy; 2026 Research and Academic LLM Services. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

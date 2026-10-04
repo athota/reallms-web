@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>REALLMS — Research &amp; Academic LLM Services at IU</title>
+
+  <!-- Rivet 2 — IU Design System -->
+  <link rel="stylesheet" href="https://unpkg.com/rivet-core@2.9.1/css/rivet.min.css">
+
+  <style>
+    /* ═══════════════════════════════════════════════════
+       GLOBAL — dark canvas layered under Rivet tokens
+    ═══════════════════════════════════════════════════ */
+    :root {
+      /* Rivet official tokens */
+      --iu-crimson:  #990000;
+      --iu-crimson-dark: #5a0c0c;
+      --iu-gold:     #FFAA00;
+      --iu-blue:     #006298;
+      --iu-black:    #243142;
+      --iu-black-000: #F8F9FA;
+      /* Extended palette for "flashy" accents */
+      --glow-cyan:   #00c9ff;
+      --glow-purple: #a855f7;
+      --dark-bg:     #08080f;
+      --card-bg:     rgba(255,255,255,0.04);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark-bg);
+      color: #e8e8f0;
+      /* Rivet's BentonSans stack */
+      font-family: 'BentonSans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                   Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+                   'Helvetica Neue', sans-serif;
+    }
+
+    /* ── Animated ambient gradient ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 15% 10%,  rgba(153,0,0,0.30) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 90%,  rgba(0,201,255,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 70% at 55% 45%,  rgba(168,85,247,0.12) 0%, transparent 55%);
+      animation: bgPulse 9s ease-in-out infinite alternate;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes bgPulse {
+      from { opacity: 1; }
+      to   { opacity: 0.55; }
+    }
+
+    /* particle canvas */
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* everything above the canvas */
+    .page-wrap { position: relative; z-index: 1; }
+
+    /* ═══════════════════════════════════════════════════
+       RIVET HEADER OVERRIDES — keep official markup,
+       dark background to match page theme
+    ═══════════════════════════════════════════════════ */
+    .rvt-header-wrapper {
+      position: relative;
+      z-index: 100;
+    }
+
+    .rvt-header-global {
+      background: rgba(10, 8, 20, 0.92) !important;
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(153,0,0,0.35);
+      box-shadow: 0 2px 40px rgba(153,0,0,0.18);
+    }
+
+    /* trident glow on hover */
+    .rvt-lockup__trident {
+      transition: filter 0.3s;
+    }
+    .rvt-lockup:hover .rvt-lockup__trident {
+      filter: drop-shadow(0 0 10px rgba(255,170,0,0.7));
+    }
+
+    .rvt-lockup__title { color: #fff !important; font-weight: 700; }
+    .rvt-lockup__subtitle { color: rgba(255,255,255,0.6) !important; }
+
+    .rvt-header-menu__link,
+    .rvt-global-toggle { color: rgba(255,255,255,0.85) !important; }
+    .rvt-header-menu__link:hover { color: var(--iu-gold) !important; }
+
+    /* ═══════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5rem 1.5rem 4rem;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--iu-crimson), #cc0000);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.35rem 1.1rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 24px rgba(153,0,0,0.55);
+      animation: popIn 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .hero-title {
+      font-size: clamp(4rem, 11vw, 9rem);
+      font-weight: 900;
+      line-height: 0.93;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 0%, var(--glow-cyan) 50%, var(--glow-purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 40px rgba(0,201,255,0.35));
+      animation: slideUp 0.9s ease both 0.2s;
+    }
+
+    .hero-wordmark {
+      font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+      font-weight: 600;
+      color: rgba(232,232,240,0.55);
+      letter-spacing: 0.05em;
+      margin-top: 0.5rem;
+      animation: slideUp 0.9s ease both 0.35s;
+    }
+
+    .hero-wordmark strong { color: var(--iu-gold); font-weight: 700; }
+
+    .hero-desc {
+      max-width: 600px;
+      margin: 1.5rem auto 0;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: rgba(232,232,240,0.68);
+      line-height: 1.65;
+      animation: slideUp 0.9s ease both 0.5s;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 2.5rem;
+      animation: slideUp 0.9s ease both 0.65s;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Rivet-style CTA buttons, enhanced */
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--iu-crimson), #c40000);
+      color: #fff !important;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.85rem 2.2rem;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 4px 30px rgba(153,0,0,0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 44px rgba(153,0,0,0.75);
+      color: #fff !important;
+    }
+
+    .btn-hero-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--glow-cyan) !important;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.85rem 2.2rem;
+      border-radius: 999px;
+      text-decoration: none;
+      border: 2px solid var(--glow-cyan);
+      box-shadow: 0 0 20px rgba(0,201,255,0.18);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .btn-hero-outline:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 0 40px rgba(0,201,255,0.45);
+      background: rgba(0,201,255,0.07);
+      color: var(--glow-cyan) !important;
+    }
+
+    .scroll-hint {
+      margin-top: 4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      color: rgba(232,232,240,0.35);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      animation: slideUp 0.9s ease both 1s;
+    }
+
+    .scroll-hint svg { animation: bounce 2.2s ease-in-out infinite; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(9px); }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       GLOWING DIVIDER
+    ═══════════════════════════════════════════════════ */
+    .glow-line {
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent,
+        var(--iu-crimson) 20%,
+        var(--glow-cyan) 50%,
+        var(--glow-purple) 80%,
+        transparent);
+      opacity: 0.45;
+      margin: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SHARED SECTION STYLES
+    ═══════════════════════════════════════════════════ */
+    .content-section {
+      padding: 6rem 1.5rem;
+    }
+
+    .content-section--alt {
+      background: rgba(255,255,255,0.018);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+
+    .section-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--glow-cyan);
+      margin-bottom: 0.6rem;
+    }
+
+    .section-heading {
+      font-size: clamp(1.8rem, 4vw, 2.9rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .section-subtext {
+      color: rgba(232,232,240,0.6);
+      line-height: 1.72;
+      max-width: 620px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       ABOUT GRID
+    ═══════════════════════════════════════════════════ */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 720px) {
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    }
+
+    .about-text p {
+      color: rgba(232,232,240,0.68);
+      line-height: 1.76;
+      margin-bottom: 1rem;
+      font-size: 0.97rem;
+    }
+
+    /* Rivet-inspired stat card */
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(0,201,255,0.18);
+      border-radius: 1.25rem;
+      padding: 2.25rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 60px rgba(0,201,255,0.07),
+                  inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.75rem;
+    }
+    .stat-row:last-child { margin-bottom: 0; }
+
+    .stat-num {
+      font-size: 2.4rem;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--iu-gold), #ff6b00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.88rem;
+      color: rgba(232,232,240,0.5);
+      margin-top: 0.3rem;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       PRODUCT HERO CARDS (Chat + API)
+    ═══════════════════════════════════════════════════ */
+    .products-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 760px) {
+      .products-grid { grid-template-columns: 1fr; }
+    }
+
+    .product-card {
+      border-radius: 1.5rem;
+      padding: 2.75rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .product-card:hover { transform: translateY(-6px); }
+
+    /* Chat card — cyan accent */
+    .product-card--chat {
+      background: linear-gradient(145deg,
+        rgba(0,201,255,0.1) 0%,
+        rgba(0,201,255,0.04) 100%);
+      border: 1px solid rgba(0,201,255,0.3);
+      box-shadow: 0 0 60px rgba(0,201,255,0.08);
+    }
+    .product-card--chat:hover {
+      box-shadow: 0 20px 60px rgba(0,201,255,0.18);
+    }
+
+    /* API card — purple accent */
+    .product-card--api {
+      background: linear-gradient(145deg,
+        rgba(168,85,247,0.12) 0%,
+        rgba(168,85,247,0.04) 100%);
+      border: 1px solid rgba(168,85,247,0.3);
+      box-shadow: 0 0 60px rgba(168,85,247,0.08);
+    }
+    .product-card--api:hover {
+      box-shadow: 0 20px 60px rgba(168,85,247,0.2);
+    }
+
+    /* decorative corner glow */
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .product-card--chat::before {
+      background: radial-gradient(circle, rgba(0,201,255,0.2) 0%, transparent 70%);
+    }
+    .product-card--api::before {
+      background: radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%);
+    }
+
+    .product-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+      width: fit-content;
+    }
+
+    .product-badge--chat {
+      background: rgba(0,201,255,0.15);
+      color: var(--glow-cyan);
+      border: 1px solid rgba(0,201,255,0.3);
+    }
+
+    .product-badge--api {
+      background: rgba(168,85,247,0.15);
+      color: var(--glow-purple);
+      border: 1px solid rgba(168,85,247,0.3);
+    }
+
+    .product-card__icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    .product-card__title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      line-height: 1.1;
+    }
+
+    .product-card__subtitle {
+      font-size: 0.8rem;
+      font-family: monospace;
+      letter-spacing: 0.04em;
+      margin-bottom: 1.25rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 0.4rem;
+      width: fit-content;
+    }
+
+    .product-card--chat .product-card__subtitle {
+      background: rgba(0,201,255,0.1);
+      color: rgba(0,201,255,0.85);
+      border: 1px solid rgba(0,201,255,0.2);
+    }
+
+    .product-card--api .product-card__subtitle {
+      background: rgba(168,85,247,0.1);
+      color: rgba(168,85,247,0.85);
+      border: 1px solid rgba(168,85,247,0.2);
+    }
+
+    .product-card__desc {
+      font-size: 0.95rem;
+      color: rgba(232,232,240,0.65);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+
+    .product-card__bullets {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .product-card__bullets li {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.88rem;
+      color: rgba(232,232,240,0.72);
+    }
+
+    .product-card__bullets li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .product-card--chat .product-card__bullets li::before {
+      background: var(--glow-cyan);
+      box-shadow: 0 0 6px var(--glow-cyan);
+    }
+
+    .product-card--api .product-card__bullets li::before {
+      background: var(--glow-purple);
+      box-shadow: 0 0 6px var(--glow-purple);
+    }
+
+    .product-card__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.8rem 1.75rem;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: fit-content;
+    }
+
+    .product-card--chat .product-card__cta {
+      background: linear-gradient(135deg, rgba(0,201,255,0.25), rgba(0,201,255,0.1));
+      color: var(--glow-cyan) !important;
+      border: 1px solid rgba(0,201,255,0.45);
+      box-shadow: 0 4px 20px rgba(0,201,255,0.15);
+    }
+    .product-card--chat .product-card__cta:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 30px rgba(0,201,255,0.35);
+    }
+
+    .product-card--api .product-card__cta {
+      background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(168,85,247,0.1));
+      color: var(--glow-purple) !important;
+      border: 1px solid rgba(168,85,247,0.45);
+      box-shadow: 0 4px 20px rgba(168,85,247,0.15);
+    }
+    .product-card--api .product-card__cta:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 30px rgba(168,85,247,0.35);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FEATURE CARDS (smaller, below the product cards)
+    ═══════════════════════════════════════════════════ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin-top: 3rem;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 1.2rem;
+      padding: 1.75rem;
+      backdrop-filter: blur(6px);
+      transition: transform 0.28s, border-color 0.28s, box-shadow 0.28s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(0,201,255,0.3);
+      box-shadow: 0 12px 36px rgba(0,201,255,0.08);
+    }
+
+    .feature-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .fi-crimson  { background: rgba(153,0,0,0.22);   box-shadow: 0 0 18px rgba(153,0,0,0.25); }
+    .fi-cyan     { background: rgba(0,201,255,0.13);  box-shadow: 0 0 18px rgba(0,201,255,0.18); }
+    .fi-purple   { background: rgba(168,85,247,0.13); box-shadow: 0 0 18px rgba(168,85,247,0.18); }
+    .fi-gold     { background: rgba(255,170,0,0.13);  box-shadow: 0 0 18px rgba(255,170,0,0.18); }
+    .fi-green    { background: rgba(5,110,65,0.2);    box-shadow: 0 0 18px rgba(5,110,65,0.2); }
+    .fi-blue     { background: rgba(0,98,152,0.18);   box-shadow: 0 0 18px rgba(0,98,152,0.2); }
+
+    .feature-title {
+      font-size: 0.97rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .feature-desc {
+      font-size: 0.855rem;
+      color: rgba(232,232,240,0.55);
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DETAILED USE CASE CARDS
+    ═══════════════════════════════════════════════════ */
+    .usecase-detailed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.4rem;
+      margin-top: 2.5rem;
+    }
+
+    .uc-detail-card {
+      border-radius: 1.25rem;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      transition: transform 0.28s, box-shadow 0.28s;
+    }
+
+    .uc-detail-card:hover { transform: translateY(-5px); }
+
+    .uc-detail-card--cyan {
+      background: linear-gradient(145deg, rgba(0,201,255,0.08) 0%, rgba(0,201,255,0.03) 100%);
+      border: 1px solid rgba(0,201,255,0.18);
+    }
+    .uc-detail-card--cyan:hover { box-shadow: 0 14px 44px rgba(0,201,255,0.12); }
+
+    .uc-detail-card--purple {
+      background: linear-gradient(145deg, rgba(168,85,247,0.09) 0%, rgba(168,85,247,0.03) 100%);
+      border: 1px solid rgba(168,85,247,0.18);
+    }
+    .uc-detail-card--purple:hover { box-shadow: 0 14px 44px rgba(168,85,247,0.14); }
+
+    .uc-detail-icon {
+      font-size: 2rem;
+      margin-bottom: 0.85rem;
+      line-height: 1;
+    }
+
+    .uc-detail-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.85rem;
+    }
+
+    .uc-detail-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .uc-detail-list li {
+      font-size: 0.875rem;
+      color: rgba(232,232,240,0.68);
+      line-height: 1.55;
+      padding-left: 1.1rem;
+      position: relative;
+    }
+
+    .uc-detail-list li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      font-weight: 700;
+    }
+
+    .uc-detail-card--cyan .uc-detail-list li::before { color: var(--glow-cyan); }
+    .uc-detail-card--purple .uc-detail-list li::before { color: var(--glow-purple); }
+
+    /* ═══════════════════════════════════════════════════
+       AVAILABLE MODELS SECTION
+    ═══════════════════════════════════════════════════ */
+    .models-section { padding: 6rem 1.5rem; }
+
+    .endpoint-group {
+      margin-top: 3rem;
+    }
+
+    .endpoint-group + .endpoint-group { margin-top: 3.5rem; }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .endpoint-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.35rem 0.9rem;
+      border-radius: 0.5rem;
+    }
+
+    .ep-chat  { background: rgba(168,85,247,0.15); color: var(--glow-purple); border: 1px solid rgba(168,85,247,0.3); }
+    .ep-embed { background: rgba(0,201,255,0.12);  color: var(--glow-cyan);   border: 1px solid rgba(0,201,255,0.28); }
+    .ep-rerank{ background: rgba(255,170,0,0.12);  color: var(--iu-gold);     border: 1px solid rgba(255,170,0,0.28); }
+
+    .endpoint-label {
+      font-size: 0.78rem;
+      color: rgba(232,232,240,0.4);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1rem;
+    }
+
+    .model-card {
+      background: var(--card-bg);
+      border-radius: 1rem;
+      padding: 1.4rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .model-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      border-radius: 1rem 1rem 0 0;
+    }
+
+    .model-card--chat   { border: 1px solid rgba(168,85,247,0.18); }
+    .model-card--chat::before   { background: linear-gradient(90deg, var(--glow-purple), transparent); }
+    .model-card--chat:hover     { transform: translateY(-4px); border-color: rgba(168,85,247,0.4); box-shadow: 0 10px 32px rgba(168,85,247,0.12); }
+
+    .model-card--embed  { border: 1px solid rgba(0,201,255,0.18); }
+    .model-card--embed::before  { background: linear-gradient(90deg, var(--glow-cyan), transparent); }
+    .model-card--embed:hover    { transform: translateY(-4px); border-color: rgba(0,201,255,0.4); box-shadow: 0 10px 32px rgba(0,201,255,0.12); }
+
+    .model-card--rerank { border: 1px solid rgba(255,170,0,0.18); }
+    .model-card--rerank::before { background: linear-gradient(90deg, var(--iu-gold), transparent); }
+    .model-card--rerank:hover   { transform: translateY(-4px); border-color: rgba(255,170,0,0.4); box-shadow: 0 10px 32px rgba(255,170,0,0.12); }
+
+    .model-id {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+      word-break: break-all;
+      line-height: 1.3;
+    }
+
+    .model-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      width: fit-content;
+    }
+
+    .badge-chat    { background: rgba(168,85,247,0.18); color: var(--glow-purple); }
+    .badge-code    { background: rgba(153,0,0,0.22);    color: #ff8080; }
+    .badge-reason  { background: rgba(0,98,152,0.22);   color: #63b1d3; }
+    .badge-general { background: rgba(255,170,0,0.15);  color: var(--iu-gold); }
+    .badge-embed   { background: rgba(0,201,255,0.15);  color: var(--glow-cyan); }
+    .badge-rerank  { background: rgba(5,110,65,0.22);   color: #63b363; }
+
+    .model-desc {
+      font-size: 0.8rem;
+      color: rgba(232,232,240,0.52);
+      line-height: 1.5;
+    }
+
+    .models-footer-note {
+      margin-top: 2.25rem;
+      padding: 1rem 1.5rem;
+      border-radius: 0.75rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.07);
+      font-size: 0.82rem;
+      color: rgba(232,232,240,0.45);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .models-footer-note a { color: rgba(168,85,247,0.7); text-decoration: underline; text-underline-offset: 2px; }
+    .models-footer-note a:hover { color: var(--glow-purple); }
+
+    /* ── RT Projects flow diagram ── */
+    .rt-flow {
+      margin-top: 2.5rem;
+      border-radius: 1.25rem;
+      border: 1px solid rgba(168,85,247,0.2);
+      background: rgba(10,5,20,0.6);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+    }
+
+    .rt-flow__header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.9rem 1.5rem;
+      background: rgba(168,85,247,0.1);
+      border-bottom: 1px solid rgba(168,85,247,0.15);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--glow-purple);
+    }
+
+    .rt-flow__body {
+      padding: 2.25rem 1.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 700px) {
+      .rt-flow__body {
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+      }
+    }
+
+    .rt-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      flex: 1;
+      min-width: 120px;
+      position: relative;
+    }
+
+    .rt-step__bubble {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 0.85rem;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .rt-step--user   .rt-step__bubble { background: rgba(0,201,255,0.15);  border: 1.5px solid rgba(0,201,255,0.4);  box-shadow: 0 0 20px rgba(0,201,255,0.2); }
+    .rt-step--rtp    .rt-step__bubble { background: rgba(168,85,247,0.15); border: 1.5px solid rgba(168,85,247,0.4); box-shadow: 0 0 20px rgba(168,85,247,0.2); }
+    .rt-step--uits   .rt-step__bubble { background: rgba(255,170,0,0.15);  border: 1.5px solid rgba(255,170,0,0.4);  box-shadow: 0 0 20px rgba(255,170,0,0.2); }
+    .rt-step--key    .rt-step__bubble { background: rgba(5,110,65,0.2);    border: 1.5px solid rgba(5,110,65,0.4);   box-shadow: 0 0 20px rgba(5,110,65,0.2); }
+    .rt-step--api    .rt-step__bubble { background: rgba(168,85,247,0.15); border: 1.5px solid rgba(168,85,247,0.4); box-shadow: 0 0 20px rgba(168,85,247,0.25); }
+
+    .rt-step__num {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--dark-bg);
+      border: 1.5px solid rgba(168,85,247,0.5);
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--glow-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rt-step__label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.3rem;
+      line-height: 1.25;
+    }
+
+    .rt-step__sub {
+      font-size: 0.72rem;
+      color: rgba(232,232,240,0.45);
+      line-height: 1.4;
+      max-width: 110px;
+    }
+
+    .rt-step__sub a {
+      color: rgba(168,85,247,0.7);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .rt-step__sub a:hover { color: var(--glow-purple); }
+
+    /* arrow between steps */
+    .rt-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 0.25rem;
+      margin-bottom: 2.1rem; /* align with bubble centre */
+      flex-shrink: 0;
+      color: rgba(168,85,247,0.45);
+    }
+
+    @media (max-width: 700px) {
+      .rt-arrow {
+        transform: rotate(90deg);
+        margin: 0.3rem 0 0.1rem;
+      }
+    }
+
+    /* ── code teaser ── */
+    .code-teaser {
+      margin-top: 2.5rem;
+      border-radius: 1.25rem;
+      border: 1px solid rgba(168,85,247,0.25);
+      overflow: hidden;
+      background: rgba(10,5,20,0.7);
+      backdrop-filter: blur(8px);
+    }
+
+    .code-teaser__label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--glow-purple);
+      background: rgba(168,85,247,0.1);
+      border-bottom: 1px solid rgba(168,85,247,0.15);
+    }
+
+    .code-teaser__block {
+      margin: 0;
+      padding: 1.75rem 1.75rem 1.5rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.75;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      color: rgba(232,232,240,0.8);
+    }
+
+    .ct-comment { color: rgba(232,232,240,0.3); font-style: italic; }
+    .ct-kw      { color: var(--glow-cyan); }
+    .ct-str     { color: #a5d6a7; }
+
+    .code-teaser__footer {
+      padding: 0.85rem 1.5rem;
+      font-size: 0.8rem;
+      color: rgba(232,232,240,0.4);
+      border-top: 1px solid rgba(168,85,247,0.1);
+    }
+
+    .code-teaser__footer a {
+      color: rgba(168,85,247,0.8);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .code-teaser__footer a:hover { color: var(--glow-purple); }
+
+    /* ═══════════════════════════════════════════════════
+       PRIVACY BANNER  (Rivet alert style, darkened)
+    ═══════════════════════════════════════════════════ */
+    .privacy-banner {
+      margin-top: 2.75rem;
+      border-radius: 1.25rem;
+      background: linear-gradient(135deg,
+        rgba(153,0,0,0.22) 0%,
+        rgba(168,85,247,0.12) 100%);
+      border: 1px solid rgba(153,0,0,0.38);
+      padding: 2.5rem;
+      display: flex;
+      gap: 1.5rem;
+      box-shadow: 0 0 60px rgba(153,0,0,0.12);
+    }
+
+    .privacy-banner__icon { font-size: 2.4rem; flex-shrink: 0; }
+
+    .privacy-banner__title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .privacy-banner__body {
+      font-size: 0.9rem;
+      color: rgba(232,232,240,0.65);
+      line-height: 1.65;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       STEPS
+    ═══════════════════════════════════════════════════ */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.4rem;
+      margin-top: 2.75rem;
+      counter-reset: steps;
+    }
+
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 1.2rem;
+      padding: 2rem;
+      position: relative;
+      counter-increment: steps;
+      transition: transform 0.28s, box-shadow 0.28s;
+    }
+
+    .step-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 44px rgba(0,0,0,0.3);
+    }
+
+    .step-card::before {
+      content: counter(steps);
+      position: absolute;
+      top: -2px;
+      right: 1.4rem;
+      font-size: 4.5rem;
+      font-weight: 900;
+      color: rgba(255,255,255,0.035);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .step-title {
+      font-size: 0.97rem;
+      font-weight: 700;
+      color: var(--glow-cyan);
+      margin-bottom: 0.45rem;
+    }
+
+    .step-desc {
+      font-size: 0.87rem;
+      color: rgba(232,232,240,0.58);
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FINAL CTA SECTION
+    ═══════════════════════════════════════════════════ */
+    .cta-section {
+      padding: 7rem 1.5rem;
+      text-align: center;
+    }
+
+    .cta-section .section-heading {
+      background: linear-gradient(135deg, #fff 0%, var(--glow-cyan) 55%, var(--glow-purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RIVET FOOTER OVERRIDES
+    ═══════════════════════════════════════════════════ */
+    .rvt-footer-base,
+    .rvt-footer-resources,
+    .rvt-footer-social {
+      position: relative;
+      z-index: 1;
+    }
+
+    .rvt-footer-resources {
+      background: rgba(10, 8, 20, 0.95) !important;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .rvt-footer-resources__heading { color: rgba(255,255,255,0.85) !important; }
+    .rvt-footer-resources a,
+    .rvt-footer-resources__text-block { color: rgba(255,255,255,0.5) !important; }
+    .rvt-footer-resources a:hover { color: var(--glow-cyan) !important; }
+
+    .rvt-footer-base {
+      background: rgba(5, 4, 12, 0.98) !important;
+      border-top: 1px solid rgba(153,0,0,0.25);
+    }
+
+    .rvt-footer-base__link { color: rgba(255,255,255,0.45) !important; }
+    .rvt-footer-base__link:hover { color: var(--iu-gold) !important; }
+    .rvt-footer-base__item { color: rgba(255,255,255,0.35) !important; }
+    .rvt-footer-base__logo { color: rgba(255,255,255,0.25) !important; }
+
+    /* ═══════════════════════════════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div class="page-wrap">
+
+  <!-- ══════════════════════════════════
+       RIVET HEADER (official markup)
+  ══════════════════════════════════ -->
+  <header class="rvt-header-wrapper">
+    <a class="rvt-header-wrapper__skip-link" href="#main-content">Skip to main content</a>
+    <div class="rvt-header-global">
+      <div class="rvt-container-xl">
+        <div class="rvt-header-global__inner">
+          <div class="rvt-header-global__logo-slot">
+            <a class="rvt-lockup" href="/">
+              <div class="rvt-lockup__tab">
+                <svg xmlns="http://www.w3.org/2000/svg" class="rvt-lockup__trident" viewBox="0 0 28 34">
+                  <path d="M-3.34344e-05 4.70897H8.83308V7.174H7.1897V21.1426H10.6134V2.72321H8.83308V0.121224H18.214V2.65476H16.2283V21.1426H19.7889V7.174H18.214V4.64047H27.0471V7.174H25.0614V23.6761L21.7746 26.8944H16.2967V30.455H18.214V33.8787H8.76463V30.592H10.6819V26.8259H5.20403L1.91726 23.6077V7.174H-3.34344e-05V4.70897Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="rvt-lockup__body">
+                <span class="rvt-lockup__title">REALLMS</span>
+                <span class="rvt-lockup__subtitle">Indiana University</span>
+              </div>
+            </a>
+          </div>
+          <div class="rvt-header-global__controls">
+            <div data-rvt-disclosure="menu" data-rvt-close-click-outside>
+              <button aria-expanded="false"
+                      class="rvt-global-toggle rvt-global-toggle--menu rvt-hide-lg-up"
+                      data-rvt-disclosure-toggle="menu">
+                <span class="rvt-sr-only">Menu</span>
+                <svg class="rvt-global-toggle__open" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15 4H1V2h14v2Zm0 5H1V7h14v2ZM1 14h14v-2H1v2Z"/></svg>
+                <svg class="rvt-global-toggle__close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="m3.5 2.086 4.5 4.5 4.5-4.5L13.914 3.5 9.414 8l4.5 4.5-1.414 1.414-4.5-4.5-4.5 4.5L2.086 12.5l4.5-4.5-4.5-4.5L3.5 2.086Z"/></svg>
+              </button>
+              <nav aria-label="Main" class="rvt-header-menu" data-rvt-disclosure-target="menu" hidden>
+                <ul class="rvt-header-menu__list">
+                  <li class="rvt-header-menu__item">
+                    <a class="rvt-header-menu__link" href="#about">About</a>
+                  </li>
+                  <li class="rvt-header-menu__item">
+                    <a class="rvt-header-menu__link" href="#products">Chat &amp; API</a>
+                  </li>
+                  <li class="rvt-header-menu__item">
+                    <a class="rvt-header-menu__link" href="#models">Models</a>
+                  </li>
+                  <li class="rvt-header-menu__item">
+                    <a class="rvt-header-menu__link" href="#use-cases">Use Cases</a>
+                  </li>
+                  <li class="rvt-header-menu__item">
+                    <a class="rvt-header-menu__link" href="#get-started">Get Started</a>
+                  </li>
+                  <li class="rvt-header-menu__item">
+                    <a class="rvt-header-menu__link" href="https://reallms.rescloud.iu.edu" target="_blank" rel="noopener">Launch Chat</a>
+                  </li>
+                  <li class="rvt-header-menu__item">
+                    <a class="rvt-header-menu__link" href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">API Docs</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════ -->
+  <main id="main-content">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-badge">Free for IU Students, Faculty &amp; Staff</div>
+      <h1 class="hero-title">REALLMS</h1>
+      <p class="hero-wordmark">
+        <strong>Research &amp; Academic Large Language Model Services</strong>
+        &nbsp;&mdash;&nbsp;Indiana University
+      </p>
+      <p class="hero-desc">
+        IU's own on-premises AI platform — powerful open-source LLMs,
+        hosted in the IU Data Center, built for privacy-conscious research and learning.
+      </p>
+      <div class="hero-ctas">
+        <a href="https://reallms.rescloud.iu.edu" class="btn-hero-primary">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Open REALLMS Chat
+        </a>
+        <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272"
+           class="btn-hero-outline" target="_blank" rel="noopener">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Explore the API
+        </a>
+      </div>
+      <div class="scroll-hint">
+        <span>Explore</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ABOUT -->
+    <section class="content-section content-section--alt" id="about">
+      <div class="section-inner">
+        <div class="reveal">
+          <p class="section-eyebrow">About the Service</p>
+          <h2 class="section-heading">What is REALLMS?</h2>
+        </div>
+        <div class="about-grid">
+          <div class="about-text reveal">
+            <p>
+              REALLMS is a <strong style="color:#fff">large language model (LLM) service</strong>
+              provided <strong style="color:#fff">at no fee</strong> to the Indiana University community.
+              All hardware runs <strong style="color:#fff">on premises in the IU Data Center</strong>,
+              so your data never leaves IU's infrastructure.
+            </p>
+            <p>
+              The service offers multiple open-source models — including
+              <strong style="color:#fff">Llama, DeepSeek, Gemma, and Qwen</strong> — accessible through a
+              web chat interface and an OpenAI-compatible API, making it a
+              privacy-safe alternative to commercial AI providers.
+            </p>
+            <p>
+              Whether you're a researcher, instructor, or student, REALLMS gives you
+              access to powerful AI tools within a governed, secure environment
+              appropriate for academic work.
+            </p>
+          </div>
+          <div class="stat-card reveal">
+            <div class="stat-row">
+              <span class="stat-num">$0</span>
+              <span class="stat-label">Cost to IU students, faculty &amp; staff</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-num">100%</span>
+              <span class="stat-label">On-premises — data stays at IU</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-num">Multiple</span>
+              <span class="stat-label">Open-source LLMs available simultaneously</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-num">API</span>
+              <span class="stat-label">OpenAI-compatible endpoint for developers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- TWO PRODUCTS: CHAT + API -->
+    <section class="content-section" id="products">
+      <div class="section-inner">
+        <div class="reveal">
+          <p class="section-eyebrow">Two Ways to Use REALLMS</p>
+          <h2 class="section-heading">Choose your interface</h2>
+          <p class="section-subtext">REALLMS offers two distinct access points — a browser-based chat for everyday use, and a developer API for building your own AI-powered applications.</p>
+        </div>
+
+        <div class="products-grid">
+
+          <!-- CHAT CARD -->
+          <div class="product-card product-card--chat reveal">
+            <div class="product-badge product-badge--chat">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+              Available Now
+            </div>
+            <div class="product-card__icon">💬</div>
+            <h3 class="product-card__title">REALLMS Chat</h3>
+            <div class="product-card__subtitle">reallms.rescloud.iu.edu</div>
+            <p class="product-card__desc">
+              A browser-based conversational AI interface — no installation, no API keys, no setup. Sign in with your IU credentials and start a conversation with any of the available open-source models in seconds.
+            </p>
+            <ul class="product-card__bullets">
+              <li>No setup required — just log in with your IU account</li>
+              <li>Switch between multiple LLMs (DeepSeek-R1, Llama 4, Gemma, Qwen, and more)</li>
+              <li>Conversation history saved within your session</li>
+              <li>Ideal for research, writing, coding help, and exploration</li>
+              <li>100% on-premises — data never leaves IU</li>
+            </ul>
+            <a href="https://reallms.rescloud.iu.edu" class="product-card__cta" target="_blank" rel="noopener">
+              Open REALLMS Chat
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+
+          <!-- API CARD -->
+          <div class="product-card product-card--api reveal">
+            <div class="product-badge product-badge--api">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+              Via RT Projects
+            </div>
+            <div class="product-card__icon">⚡</div>
+            <h3 class="product-card__title">REALLMS API</h3>
+            <div class="product-card__subtitle">OpenAI-Compatible Endpoint</div>
+            <p class="product-card__desc">
+              An OpenAI-compatible REST API for developers and researchers who want to integrate REALLMS models directly into their own applications, scripts, or pipelines. Access is allocated through IU's <a href="https://projects.rt.iu.edu" style="color:var(--glow-purple)" target="_blank" rel="noopener">RT Projects</a> system.
+            </p>
+            <ul class="product-card__bullets">
+              <li>Drop-in replacement for the OpenAI API — minimal code changes</li>
+              <li>Request access through <a href="https://projects.rt.iu.edu" style="color:var(--glow-purple)" target="_blank" rel="noopener">IU RT Projects</a></li>
+              <li>Use with Python, JavaScript, curl, or any HTTP client</li>
+              <li>Build AI-powered apps, automations, and research tools</li>
+              <li>Same on-premises privacy guarantees as REALLMS Chat</li>
+            </ul>
+            <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272"
+               class="product-card__cta" target="_blank" rel="noopener">
+              API Documentation &amp; Access
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- AVAILABLE MODELS -->
+    <section class="models-section content-section--alt" id="models">
+      <div class="section-inner">
+        <div class="reveal">
+          <p class="section-eyebrow">What's Running on REALLMS</p>
+          <h2 class="section-heading">Available Models</h2>
+          <p class="section-subtext">All models run entirely on IU hardware. More endpoints and models are being added — check the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener" style="color:var(--glow-cyan)">REALLMS API documentation</a> for the latest.</p>
+        </div>
+
+        <!-- /chat/completions + /completions -->
+        <div class="endpoint-group reveal">
+          <div class="endpoint-header">
+            <span class="endpoint-pill ep-chat">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              /chat/completions
+            </span>
+            <span class="endpoint-pill ep-chat">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+              /completions
+            </span>
+            <span class="endpoint-label">Chat &amp; text generation</span>
+          </div>
+          <div class="models-grid">
+
+            <div class="model-card model-card--chat">
+              <div class="model-id">DeepSeek-R1</div>
+              <span class="model-type-badge badge-reason">Reasoning</span>
+              <p class="model-desc">Advanced chain-of-thought reasoning model — well-suited for complex problem solving, math, and multi-step logic.</p>
+            </div>
+
+            <div class="model-card model-card--chat">
+              <div class="model-id">gemma-4-31B-it</div>
+              <span class="model-type-badge badge-chat">Instruct</span>
+              <p class="model-desc">Google Gemma 4, 31B instruction-tuned. Strong general-purpose assistant for writing, analysis, and Q&amp;A.</p>
+            </div>
+
+            <div class="model-card model-card--chat">
+              <div class="model-id">gpt-oss-120b</div>
+              <span class="model-type-badge badge-general">General</span>
+              <p class="model-desc">Large 120B open-source model for high-capability general tasks requiring broad knowledge and nuanced responses.</p>
+            </div>
+
+            <div class="model-card model-card--chat">
+              <div class="model-id">llama-4-scout</div>
+              <span class="model-type-badge badge-chat">Instruct</span>
+              <p class="model-desc">Meta Llama 4 Scout — a fast, capable instruct model suitable for a wide range of conversational and analytical tasks.</p>
+            </div>
+
+            <div class="model-card model-card--chat">
+              <div class="model-id">Qwen3-Coder-Next</div>
+              <span class="model-type-badge badge-code">Code</span>
+              <p class="model-desc">Qwen3 model optimized for code generation, debugging, and programming tasks across many languages.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- /embeddings -->
+        <div class="endpoint-group reveal">
+          <div class="endpoint-header">
+            <span class="endpoint-pill ep-embed">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              /embeddings
+            </span>
+            <span class="endpoint-label">Text embeddings for search &amp; retrieval</span>
+          </div>
+          <div class="models-grid">
+
+            <div class="model-card model-card--embed">
+              <div class="model-id">Qwen3-Embedding-8B</div>
+              <span class="model-type-badge badge-embed">Embedding</span>
+              <p class="model-desc">High-quality 8B text embedding model. Ideal for semantic search, RAG pipelines, and document similarity.</p>
+            </div>
+
+            <div class="model-card model-card--embed">
+              <div class="model-id">embeddinggemma-300m</div>
+              <span class="model-type-badge badge-embed">Embedding</span>
+              <p class="model-desc">Lightweight Gemma-based embedding model at 300M parameters — fast and efficient for high-volume workloads.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- /rerank -->
+        <div class="endpoint-group reveal">
+          <div class="endpoint-header">
+            <span class="endpoint-pill ep-rerank">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+              /rerank
+            </span>
+            <span class="endpoint-label">Semantic reranking</span>
+          </div>
+          <div class="models-grid">
+
+            <div class="model-card model-card--rerank">
+              <div class="model-id">Qwen3-Reranker-8B</div>
+              <span class="model-type-badge badge-rerank">Reranker</span>
+              <p class="model-desc">Semantic reranking model for improving search result relevance — useful in RAG and information retrieval pipelines.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="models-footer-note reveal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;color:rgba(232,232,240,0.35)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          More models and endpoints are being added regularly. For the authoritative current list, see the
+          <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">REALLMS API Knowledge Base article (KB0027272)</a>.
+          Also available: <code style="background:rgba(255,255,255,0.06);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.78rem;color:rgba(232,232,240,0.6)">/models</code> endpoint to list all available models programmatically.
+        </div>
+
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- PLATFORM FEATURES -->
+    <section class="content-section content-section--alt" id="features">
+      <div class="section-inner">
+        <div class="reveal">
+          <p class="section-eyebrow">Platform Features</p>
+          <h2 class="section-heading">Built for IU, by IU</h2>
+          <p class="section-subtext">Everything REALLMS does is grounded in IU's commitment to open, privacy-respecting academic infrastructure.</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-card reveal">
+            <div class="feature-icon fi-crimson">🏛️</div>
+            <h3 class="feature-title">IU-Hosted &amp; Governed</h3>
+            <p class="feature-desc">All compute runs inside the IU Data Center. Your prompts are never sent to third-party cloud providers.</p>
+          </div>
+          <div class="feature-card reveal">
+            <div class="feature-icon fi-gold">⚡</div>
+            <h3 class="feature-title">Multiple Open-Source Models</h3>
+            <p class="feature-desc">Choose from DeepSeek, Gemma, Llama, Qwen, and other leading open-source LLMs — all running on IU hardware.</p>
+          </div>
+          <div class="feature-card reveal">
+            <div class="feature-icon fi-green">🔒</div>
+            <h3 class="feature-title">Privacy-Conscious</h3>
+            <p class="feature-desc">Suitable for sensitive research workflows. Conversations are not used to train external models or shared with third parties.</p>
+          </div>
+          <div class="feature-card reveal">
+            <div class="feature-icon fi-blue">🎓</div>
+            <h3 class="feature-title">Free for IU Community</h3>
+            <p class="feature-desc">No subscription fees, no API billing. Available to all IU students, faculty, and staff at no charge.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- USE CASES — detailed, split by product -->
+    <section class="content-section content-section--alt" id="use-cases">
+      <div class="section-inner">
+
+        <!-- ── CHAT USE CASES ── -->
+        <div class="reveal">
+          <p class="section-eyebrow" style="color:var(--glow-cyan)">REALLMS Chat — What can you do?</p>
+          <h2 class="section-heading">Conversational AI for everyday academic work</h2>
+          <p class="section-subtext">Open the browser, log in with your IU account, and start working. No setup required.</p>
+        </div>
+
+        <div class="usecase-detailed-grid reveal">
+
+          <div class="uc-detail-card uc-detail-card--cyan">
+            <div class="uc-detail-icon">📝</div>
+            <h3 class="uc-detail-title">Research &amp; Writing</h3>
+            <ul class="uc-detail-list">
+              <li>Summarize and synthesize research papers</li>
+              <li>Draft and refine grant proposals or abstracts</li>
+              <li>Get feedback on academic writing style and clarity</li>
+              <li>Generate literature review outlines</li>
+            </ul>
+          </div>
+
+          <div class="uc-detail-card uc-detail-card--cyan">
+            <div class="uc-detail-icon">💻</div>
+            <h3 class="uc-detail-title">Coding Assistance</h3>
+            <ul class="uc-detail-list">
+              <li>Write, debug, and explain code in any language</li>
+              <li>Translate scripts between Python, R, Julia, and more</li>
+              <li>Get explanations of complex algorithms or library APIs</li>
+              <li>Review code for correctness and best practices</li>
+            </ul>
+          </div>
+
+          <div class="uc-detail-card uc-detail-card--cyan">
+            <div class="uc-detail-icon">🎓</div>
+            <h3 class="uc-detail-title">Teaching &amp; Learning</h3>
+            <ul class="uc-detail-list">
+              <li>Explore concepts interactively as a student</li>
+              <li>Generate quiz questions or course material drafts</li>
+              <li>Prototype tutoring bot conversations</li>
+              <li>Practice prompt engineering and AI literacy skills</li>
+            </ul>
+          </div>
+
+          <div class="uc-detail-card uc-detail-card--cyan">
+            <div class="uc-detail-icon">🔬</div>
+            <h3 class="uc-detail-title">Data &amp; Analysis</h3>
+            <ul class="uc-detail-list">
+              <li>Annotate and categorize qualitative research data</li>
+              <li>Describe datasets and suggest analysis strategies</li>
+              <li>Draft IRB protocol language or consent forms</li>
+              <li>Work with sensitive data safely — all on-premises</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="glow-line" style="margin:3.5rem 0;opacity:0.25;"></div>
+
+        <!-- ── API USE CASES ── -->
+        <div class="reveal">
+          <p class="section-eyebrow" style="color:var(--glow-purple)">REALLMS API — What can you build?</p>
+          <h2 class="section-heading">Integrate AI directly into your tools &amp; workflows</h2>
+          <p class="section-subtext">The REALLMS API is OpenAI-compatible, so if you've used the OpenAI Python SDK, LangChain, or any standard HTTP client, you can point it at REALLMS with minimal changes. Access is allocated via IU's <a href="https://projects.rt.iu.edu" style="color:var(--glow-purple)" target="_blank" rel="noopener">RT Projects</a> system — see the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" style="color:var(--glow-purple)" target="_blank" rel="noopener">REALLMS API documentation</a> to get started.</p>
+        </div>
+
+        <div class="usecase-detailed-grid reveal">
+
+          <div class="uc-detail-card uc-detail-card--purple">
+            <div class="uc-detail-icon">🖥️</div>
+            <h3 class="uc-detail-title">IDE &amp; Editor Integration</h3>
+            <ul class="uc-detail-list">
+              <li>Configure <strong>VS Code</strong> with Continue.dev — set the REALLMS endpoint as your provider for inline code completions and chat</li>
+              <li>Use with <strong>Cursor</strong>, <strong>Zed</strong>, or any editor that supports a custom OpenAI-compatible backend</li>
+              <li>Get AI coding assistance without sending your code to external servers</li>
+            </ul>
+          </div>
+
+          <div class="uc-detail-card uc-detail-card--purple">
+            <div class="uc-detail-icon">🤖</div>
+            <h3 class="uc-detail-title">AI Agents &amp; Automation</h3>
+            <ul class="uc-detail-list">
+              <li>Build research agents with <strong>LangChain</strong> or <strong>LlamaIndex</strong> — swap the base URL and your agent runs on IU hardware</li>
+              <li>Power autonomous agents using frameworks like <strong>AutoGen</strong> or <strong>CrewAI</strong></li>
+              <li>Orchestrate multi-step pipelines that reason, search, and act — all within IU's infrastructure</li>
+            </ul>
+          </div>
+
+          <div class="uc-detail-card uc-detail-card--purple">
+            <div class="uc-detail-icon">🔗</div>
+            <h3 class="uc-detail-title">Custom Applications</h3>
+            <ul class="uc-detail-list">
+              <li>Build a department-specific chatbot or help desk tool</li>
+              <li>Add AI-powered search or summarization to an existing web app</li>
+              <li>Create Slack bots, Canvas integrations, or internal tools</li>
+              <li>Use the API from Python, JavaScript, R, curl — anything that speaks HTTP</li>
+            </ul>
+          </div>
+
+          <div class="uc-detail-card uc-detail-card--purple">
+            <div class="uc-detail-icon">⚗️</div>
+            <h3 class="uc-detail-title">Research Pipelines</h3>
+            <ul class="uc-detail-list">
+              <li>Batch-process documents, annotations, or datasets programmatically</li>
+              <li>Run structured extraction or classification at scale</li>
+              <li>Integrate LLMs into Jupyter notebooks for reproducible AI research</li>
+              <li>Compare model outputs across multiple REALLMS models via the API</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- RT Projects → REALLMS API allocation flow -->
+        <div class="rt-flow reveal">
+          <div class="rt-flow__header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            How API access works: RT Projects → REALLMS
+          </div>
+          <div class="rt-flow__body">
+
+            <!-- Step 1 -->
+            <div class="rt-step rt-step--user">
+              <div class="rt-step__bubble">
+                🧑‍🔬
+                <span class="rt-step__num">1</span>
+              </div>
+              <p class="rt-step__label">You</p>
+              <p class="rt-step__sub">Researcher, developer, or instructor at IU</p>
+            </div>
+
+            <div class="rt-arrow">
+              <svg width="28" height="16" viewBox="0 0 28 16" fill="none"><path d="M0 8h24M18 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="rt-step rt-step--rtp">
+              <div class="rt-step__bubble">
+                📋
+                <span class="rt-step__num">2</span>
+              </div>
+              <p class="rt-step__label">Create an RT Project</p>
+              <p class="rt-step__sub"><a href="https://projects.rt.iu.edu" target="_blank" rel="noopener">projects.rt.iu.edu</a> — describe your use case &amp; request REALLMS API access<br><a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" target="_blank" rel="noopener">KB0024132</a></p>
+            </div>
+
+            <div class="rt-arrow">
+              <svg width="28" height="16" viewBox="0 0 28 16" fill="none"><path d="M0 8h24M18 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="rt-step rt-step--uits">
+              <div class="rt-step__bubble">
+                🏛️
+                <span class="rt-step__num">3</span>
+              </div>
+              <p class="rt-step__label">UITS Reviews</p>
+              <p class="rt-step__sub">Team reviews your project scope and approves the allocation</p>
+            </div>
+
+            <div class="rt-arrow">
+              <svg width="28" height="16" viewBox="0 0 28 16" fill="none"><path d="M0 8h24M18 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="rt-step rt-step--key">
+              <div class="rt-step__bubble">
+                🔑
+                <span class="rt-step__num">4</span>
+              </div>
+              <p class="rt-step__label">API Key Issued</p>
+              <p class="rt-step__sub">A project-scoped API key is provisioned and delivered to you</p>
+            </div>
+
+            <div class="rt-arrow">
+              <svg width="28" height="16" viewBox="0 0 28 16" fill="none"><path d="M0 8h24M18 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="rt-step rt-step--api">
+              <div class="rt-step__bubble">
+                ⚡
+                <span class="rt-step__num">5</span>
+              </div>
+              <p class="rt-step__label">Call the REALLMS API</p>
+              <p class="rt-step__sub">Use your key with any OpenAI-compatible client — <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" target="_blank" rel="noopener">see docs</a></p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- API code snippet teaser -->
+        <div class="code-teaser reveal">
+          <div class="code-teaser__label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            It's as simple as changing one line
+          </div>
+          <pre class="code-teaser__block"><code><span class="ct-comment"># Before: OpenAI</span>
+<span class="ct-kw">from</span> openai <span class="ct-kw">import</span> OpenAI
+client = OpenAI(api_key=<span class="ct-str">"sk-..."</span>)
+
+<span class="ct-comment"># After: REALLMS (same code, IU-hosted)</span>
+client = OpenAI(
+    base_url=<span class="ct-str">"https://reallms.rescloud.iu.edu/api/v1"</span>,
+    api_key=<span class="ct-str">"your-rt-project-key"</span>
+)
+
+response = client.chat.completions.create(
+    model=<span class="ct-str">"llama-4-scout"</span>,
+    messages=[{<span class="ct-str">"role"</span>: <span class="ct-str">"user"</span>, <span class="ct-str">"content"</span>: <span class="ct-str">"Hello!"</span>}]
+)</code></pre>
+          <div class="code-teaser__footer">
+            See the full API reference in the
+            <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272"
+               target="_blank" rel="noopener">REALLMS API Knowledge Base article (KB0027272)</a>
+          </div>
+        </div>
+
+        <div class="privacy-banner reveal">
+          <div class="privacy-banner__icon">🛡️</div>
+          <div>
+            <p class="privacy-banner__title">Your data stays at IU</p>
+            <p class="privacy-banner__body">
+              Unlike commercial LLM services, REALLMS runs entirely on IU-owned hardware
+              inside the IU Data Center. Conversations are not used to train external models
+              and are not shared with third parties. Always consult
+              <a href="https://policies.iu.edu/policies/it-12-1-information-handling-and-classification/index.html"
+                 style="color:var(--iu-gold)" target="_blank" rel="noopener">IU's data classification guidelines</a>
+              before working with restricted or regulated data.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- GET STARTED -->
+    <section class="content-section" id="get-started">
+      <div class="section-inner">
+        <div class="reveal">
+          <p class="section-eyebrow">Get Started</p>
+          <h2 class="section-heading">Up and running in minutes</h2>
+          <p class="section-subtext">Pick the path that fits your workflow — no extra accounts needed beyond your standard IU login.</p>
+        </div>
+
+        <!-- Chat path -->
+        <div class="reveal" style="margin-top:2.5rem;">
+          <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--glow-cyan);margin-bottom:1rem;">
+            Path A &mdash; REALLMS Chat
+          </p>
+        </div>
+        <div class="steps-grid reveal" style="margin-top:0.75rem;">
+          <div class="step-card">
+            <p class="step-title">Go to REALLMS Chat</p>
+            <p class="step-desc">Navigate to <strong style="color:#fff">reallms.rescloud.iu.edu</strong> in any modern browser.</p>
+          </div>
+          <div class="step-card">
+            <p class="step-title">Log in with IU credentials</p>
+            <p class="step-desc">Authenticate with your IU username and passphrase via CAS — the same login you use for Canvas or One.IU.</p>
+          </div>
+          <div class="step-card">
+            <p class="step-title">Pick a model &amp; start chatting</p>
+            <p class="step-desc">Choose from available LLMs and begin your conversation immediately. No configuration required.</p>
+          </div>
+        </div>
+
+        <!-- API path -->
+        <div class="reveal" style="margin-top:3rem;">
+          <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--glow-purple);margin-bottom:1rem;">
+            Path B &mdash; REALLMS API
+          </p>
+        </div>
+        <div class="steps-grid reveal" style="margin-top:0.75rem;">
+          <div class="step-card">
+            <p class="step-title">Read the documentation</p>
+            <p class="step-desc">Visit the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" style="color:var(--glow-purple)" target="_blank" rel="noopener">REALLMS API KB article (KB0027272)</a> to understand the endpoint structure, available models, and authentication requirements.</p>
+          </div>
+          <div class="step-card">
+            <p class="step-title">Request access via RT Projects</p>
+            <p class="step-desc">API access is allocated through IU's <a href="https://projects.rt.iu.edu" style="color:var(--glow-purple)" target="_blank" rel="noopener">RT Projects</a> system. See <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" style="color:var(--glow-purple)" target="_blank" rel="noopener">KB0024132</a> for full instructions on creating an RT Project and requesting REALLMS API allocation.</p>
+          </div>
+          <div class="step-card">
+            <p class="step-title">Point your code at REALLMS</p>
+            <p class="step-desc">Set your OpenAI client's <code style="background:rgba(168,85,247,0.15);color:var(--glow-purple);padding:0.1rem 0.4rem;border-radius:4px">base_url</code> to the REALLMS API endpoint and your API key — no other changes needed for most apps.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- FINAL CTA -->
+    <section class="cta-section">
+      <div class="section-inner reveal">
+        <h2 class="section-heading" style="font-size: clamp(2rem, 5vw, 3.5rem);">Ready to explore AI at IU?</h2>
+        <p class="section-subtext" style="margin: 0.75rem auto 2.5rem;">
+          REALLMS is free, private, and available right now for every member of
+          the Indiana University community.
+        </p>
+        <div class="hero-ctas" style="justify-content:center;">
+          <a href="https://reallms.rescloud.iu.edu" class="btn-hero-primary" target="_blank" rel="noopener">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Open REALLMS Chat
+          </a>
+          <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272"
+             class="btn-hero-outline" target="_blank" rel="noopener">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            API Docs &amp; Access
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════════
+       RIVET FOOTER (official markup)
+  ══════════════════════════════════ -->
+  <div aria-labelledby="footer-resources-heading" class="rvt-footer-resources" role="complementary">
+    <h2 class="rvt-sr-only" id="footer-resources-heading">Additional resources</h2>
+    <div class="rvt-container-lg">
+      <div class="rvt-row">
+        <div class="rvt-cols-3-md">
+          <h3 class="rvt-footer-resources__heading">REALLMS</h3>
+          <div class="rvt-footer-resources__text-block">
+            Research &amp; Academic LLM Services<br>
+            Provided by UITS<br>
+            Indiana University
+          </div>
+        </div>
+        <div class="rvt-cols-3-md">
+          <h3 class="rvt-footer-resources__heading">Access</h3>
+          <ul class="rvt-footer-resources__list">
+            <li class="rvt-footer-resources__list-item">
+              <a href="https://reallms.iu.edu">Launch REALLMS</a>
+            </li>
+            <li class="rvt-footer-resources__list-item">
+              <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272">API Knowledge Base</a>
+            </li>
+          </ul>
+        </div>
+        <div class="rvt-cols-3-md">
+          <h3 class="rvt-footer-resources__heading">Support</h3>
+          <ul class="rvt-footer-resources__list">
+            <li class="rvt-footer-resources__list-item">
+              <a href="https://uits.iu.edu">UITS Home</a>
+            </li>
+            <li class="rvt-footer-resources__list-item">
+              <a href="https://servicenow.iu.edu">IU Service Center</a>
+            </li>
+          </ul>
+        </div>
+        <div class="rvt-cols-3-md">
+          <h3 class="rvt-footer-resources__heading">Policies</h3>
+          <ul class="rvt-footer-resources__list">
+            <li class="rvt-footer-resources__list-item">
+              <a href="https://www.iu.edu/privacy/index.html">Privacy Notice</a>
+            </li>
+            <li class="rvt-footer-resources__list-item">
+              <a href="https://accessibility.iu.edu/assistance/">Accessibility</a>
+            </li>
+            <li class="rvt-footer-resources__list-item">
+              <a href="https://www.iu.edu/nondiscrimination/index.html">Non-discrimination</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="rvt-footer-base">
+    <div class="rvt-container-lg">
+      <div class="rvt-footer-base__inner">
+        <div class="rvt-footer-base__logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <polygon fill="currentColor" points="15.3 3.19 15.3 5 16.55 5 16.55 15.07 13.9 15.07 13.9 1.81 15.31 1.81 15.31 0 8.72 0 8.72 1.81 10.12 1.81 10.12 15.07 7.45 15.07 7.45 5 8.7 5 8.7 3.19 2.5 3.19 2.5 5 3.9 5 3.9 16.66 6.18 18.98 10.12 18.98 10.12 21.67 8.72 21.67 8.72 24 15.3 24 15.3 21.67 13.9 21.67 13.9 18.98 17.82 18.98 20.09 16.66 20.09 5 21.5 5 21.5 3.19 15.3 3.19"/>
+          </svg>
+        </div>
+        <ul class="rvt-footer-base__list">
+          <li class="rvt-footer-base__item">
+            <a class="rvt-footer-base__link" href="https://accessibility.iu.edu/assistance/">Accessibility</a>
+          </li>
+          <li class="rvt-footer-base__item">
+            <a class="rvt-footer-base__link" href="https://www.iu.edu/privacy/index.html">Privacy Notice</a>
+          </li>
+          <li class="rvt-footer-base__item">
+            <a class="rvt-footer-base__link" href="https://www.iu.edu/copyright/index.html">Copyright</a>
+            &copy; 2026 The Trustees of
+            <a class="rvt-footer-base__link" href="https://www.iu.edu">Indiana University</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /.page-wrap -->
+
+<!-- Rivet JS -->
+<script src="https://unpkg.com/rivet-core@2.9.1/js/rivet.min.js"></script>
+<script>Rivet.init();</script>
+
+<script>
+/* ── Particle system ── */
+(function () {
+  const canvas = document.getElementById('particles');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  const COLORS = [
+    'rgba(0,201,255,',
+    'rgba(168,85,247,',
+    'rgba(153,0,0,',
+    'rgba(255,170,0,'
+  ];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function Particle() {
+    this.x     = Math.random() * W;
+    this.y     = Math.random() * H;
+    this.r     = Math.random() * 1.4 + 0.3;
+    this.vx    = (Math.random() - 0.5) * 0.38;
+    this.vy    = (Math.random() - 0.5) * 0.38;
+    this.alpha = Math.random() * 0.55 + 0.08;
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  }
+
+  Particle.prototype.update = function () {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0) this.x = W;
+    if (this.x > W) this.x = 0;
+    if (this.y < 0) this.y = H;
+    if (this.y > H) this.y = 0;
+  };
+
+  Particle.prototype.draw = function () {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = this.color + this.alpha + ')';
+    ctx.fill();
+  };
+
+  function init() {
+    resize();
+    particles = [];
+    const count = Math.floor((W * H) / 9000);
+    for (let i = 0; i < count; i++) particles.push(new Particle());
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx   = particles[i].x - particles[j].x;
+        const dy   = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 110) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(0,201,255,' + (0.055 * (1 - dist / 110)) + ')';
+          ctx.lineWidth   = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', init);
+  init();
+  loop();
+})();
+
+/* ── Scroll reveal ── */
+(function () {
+  const els = document.querySelectorAll('.reveal');
+  const io  = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(el => io.observe(el));
+})();
+</script>
+
+</body>
+</html>

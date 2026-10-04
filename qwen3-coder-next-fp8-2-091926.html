@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REALLMS - Research and Academic LLM Services</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/rivet.iu.edu@1.0.0/dist/css/rivet.min.css">
+    <style>
+        :root {
+            --iu-blue: #006298;
+            --iu-crimson: #990000;
+            --iu-gold: #ffaa00;
+            --iu-black: #243142;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--iu-blue) 0%, #004f80 50%, #00385f 100%);
+        }
+        
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .model-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .model-card:hover {
+            border-color: var(--iu-blue);
+            transform: scale(1.02);
+        }
+        
+        .api-process-step {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .api-process-step::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: var(--iu-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .flow-diagram {
+            position: relative;
+            padding: 40px 0;
+        }
+        
+        .flow-arrow {
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            color: var(--iu-blue);
+        }
+        
+        .badge-new {
+            background: var(--iu-gold);
+            color: var(--iu-black);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .cta-button {
+            background: var(--iu-blue);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: var(--iu-crimson);
+            transform: translateY(-2px);
+        }
+        
+        .section-header {
+            position: relative;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: var(--iu-crimson);
+            border-radius: 2px;
+        }
+        
+        .code-block {
+            background: var(--iu-black);
+            color: #e0e0e0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+        }
+        
+        .api-endpoint {
+            background: #f0f4f8;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--iu-blue);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--iu-blue);
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            border-radius: 12px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--iu-blue);
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: var(--iu-black);
+            font-weight: 500;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <header class="rvt-header" role="banner">
+        <div class="rvt-container-lg">
+            <div class="rvt-header__inner">
+                <div class="rvt-header__branding">
+                    <a href="https://www.iu.edu" class="rvt-header__logo">
+                        <svg aria-hidden="true" width="40" height="40" viewBox="0 0 40 40" fill="currentColor">
+                            <path d="M20 0C8.954 0 0 8.954 0 20s8.954 20 20 20 20-8.954 20-20S31.046 0 20 0zm0 36c-8.837 0-16-7.163-16-16S11.163 4 20 4s16 7.163 16 16-7.163 16-16 16z"/>
+                            <path d="M28 12h-4v4h-4v-4h-4v4h-4v4h4v4h4v-4h4v-4h4v-4z"/>
+                            <path d="M12 20h4v4h-4v-4zm0 8h4v4h-4v-4z"/>
+                        </svg>
+                    </a>
+                    <span class="rvt-header__site-title">REALLMS</span>
+                </div>
+                <nav class="rvt-header__nav" role="navigation">
+                    <a href="#about" class="rvt-header__nav-link">About</a>
+                    <a href="#components" class="rvt-header__nav-link">Components</a>
+                    <a href="#models" class="rvt-header__nav-link">Models</a>
+                    <a href="#api" class="rvt-header__nav-link">API</a>
+                    <a href="#use-cases" class="rvt-header__nav-link">Use Cases</a>
+                </nav>
+                <div class="rvt-header__actions">
+                    <a href="https://reallms.rescloud.iu.edu" class="rvt-button rvt-button--small">Login</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="rvt-hero hero-gradient">
+            <div class="rvt-container-lg">
+                <div class="rvt-hero__inner">
+                    <div class="rvt-hero__body">
+                        <span class="rvt-hero__eyebrow">Research and Academic LLM Services</span>
+                        <h1 class="rvt-hero__title">Unlock the Power of AI for Your Research</h1>
+                        <p class="rvt-hero__teaser">
+                            REALLMS provides Indiana University researchers, faculty, and staff with free access to state-of-the-art large language models through both an intuitive chat interface and powerful API.
+                        </p>
+                        <div class="rvt-hero__actions">
+                            <a href="#about" class="rvt-button rvt-button--primary">Get Started</a>
+                            <a href="https://reallms.rescloud.iu.edu" class="rvt-button rvt-button--secondary">Try REALLMS Chat</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="rvt-container-lg rvt-p-top-xl">
+            <div class="rvt-row rvt-flow">
+                <div class="rvt-cols-12">
+                    <div class="section-header">
+                        <h2>About REALLMS</h2>
+                    </div>
+                    <p class="rvt-flow">
+                        Research and Academic LLM Services (REALLMS) is a large-language model (LLM)-powered service provided at no fee to the Indiana University community. All the hardware is on premises in the IU Data Center, ensuring your data stays within the IU ecosystem.
+                    </p>
+                    <p class="rvt-flow">
+                        REALLMS provides two core services that empower your research and academic work:
+                    </p>
+                    <ul class="rvt-list rvt-list--bulleted rvt-m-top-md">
+                        <li><strong>REALLMS Chat</strong> - An intuitive, web-based interface for interacting with LLMs through natural language conversations</li>
+                        <li><strong>REALLMS API</strong> - A powerful programmatic interface for integrating LLM capabilities into your workflows, applications, and research pipelines</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="components" class="rvt-p-top-xxl rvt-p-bottom-xxl" style="background: linear-gradient(180deg, #f5f7fa 0%, #e4e8ec 100%);">
+            <div class="rvt-container-lg">
+                <div class="section-header">
+                    <h2>Two Major Components</h2>
+                </div>
+                
+                <div class="rvt-row rvt-flow">
+                    <div class="rvt-cols-12 rvt-cols-6-md">
+                        <div class="rvt-card rvt-card--raised feature-card">
+                            <div class="rvt-card__body">
+                                <span class="badge-new rvt-m-bottom-sm">Primary</span>
+                                <h2 class="rvt-card__title">REALLMS Chat</h2>
+                                <p class="rvt-card__content">
+                                    A user-friendly chat interface powered by Open WebUI AI with vLLM backend. Access multiple LLMs through an intuitive web interface with no separate account needed.
+                                </p>
+                                <div class="rvt-m-top-md rvt-flow">
+                                    <a href="https://reallms.rescloud.iu.edu" class="rvt-button rvt-button--primary">Access Chat</a>
+                                    <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027284" class="rvt-button rvt-button--plain">Documentation</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rvt-cols-12 rvt-cols-6-md">
+                        <div class="rvt-card rvt-card--raised feature-card">
+                            <div class="rvt-card__body">
+                                <span class="badge-new rvt-m-bottom-sm">For Developers</span>
+                                <h2 class="rvt-card__title">REALLMS API</h2>
+                                <p class="rvt-card__content">
+                                    Programmatic access to LLMs through the RT Projects system. Integrate AI capabilities into your research workflows, IDEs, and applications with RESTful API endpoints.
+                                </p>
+                                <div class="rvt-m-top-md rvt-flow">
+                                    <a href="https://projects.rt.iu.edu" class="rvt-button rvt-button--primary">Get API Key</a>
+                                    <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0027272" class="rvt-button rvt-button--plain">API Documentation</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="models" class="rvt-container-lg rvt-p-top-xxl">
+            <div class="section-header">
+                <h2>Available Models</h2>
+                <p class="rvt-flow">Choose from a curated selection of state-of-the-art LLMs, each optimized for different use cases and requirements.</p>
+            </div>
+            
+            <div class="rvt-row rvt-flow">
+                <div class="rvt-cols-12 rvt-cols-6-md rvt-cols-3-lg">
+                    <div class="rvt-card model-card">
+                        <div class="rvt-card__body">
+                            <h3 class="rvt-card__title">Gemma 4 31B</h3>
+                            <div class="rvt-card__content rvt-flow">
+                                <ul class="rvt-list rvt-list--bulleted">
+                                    <li>256 K context length</li>
+                                    <li>Tensor type: BF16</li>
+                                    <li>General purpose</li>
+                                    <li>Long-term supported</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rvt-cols-12 rvt-cols-6-md rvt-cols-3-lg">
+                    <div class="rvt-card model-card">
+                        <div class="rvt-card__body">
+                            <h3 class="rvt-card__title">GLM 5.2</h3>
+                            <div class="rvt-card__content rvt-flow">
+                                <ul class="rvt-list rvt-list--bulleted">
+                                    <li>256 K context length</li>
+                                    <li>Tensor type: FP8</li>
+                                    <li>Efficient inference</li>
+                                    <li>Strong performance</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rvt-cols-12 rvt-cols-6-md rvt-cols-3-lg">
+                    <div class="rvt-card model-card">
+                        <div class="rvt-card__body">
+                            <h3 class="rvt-card__title">GPT OSS 120B</h3>
+                            <div class="rvt-card__content rvt-flow">
+                                <ul class="rvt-list rvt-list--bulleted">
+                                    <li>128 K context length</li>
+                                    <li>Tensor type: BF16+UB</li>
+                                    <li>High capacity</li>
+                                    <li>Complex reasoning</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rvt-cols-12 rvt-cols-6-md rvt-cols-3-lg">
+                    <div class="rvt-card model-card">
+                        <div class="rvt-card__body">
+                            <h3 class="rvt-card__title">Qwen3 Coder Next</h3>
+                            <div class="rvt-card__content rvt-flow">
+                                <ul class="rvt-list rvt-list--bulleted">
+                                    <li>256 K context length</li>
+                                    <li>Tensor type: FP8</li>
+                                    <li>Code generation</li>
+                                    <li>Developer-focused</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rvt-m-top-xl rvt-card rvt-card--raised">
+                <div class="rvt-card__body">
+                    <h3 class="rvt-card__title">Embedding & Reranking Models</h3>
+                    <div class="rvt-card__content rvt-flow">
+                        <p><strong>Embedding Models:</strong></p>
+                        <ul class="rvt-list rvt-list--bulleted">
+                            <li>Qwen3-Embedding-8B</li>
+                            <li>embeddinggemma-300m</li>
+                        </ul>
+                        <p><strong>Reranking Models:</strong></p>
+                        <ul class="rvt-list rvt-list--bulleted">
+                            <li>Qwen3-Reranker-8B</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="api" class="rvt-p-top-xxl rvt-p-bottom-xxl" style="background: linear-gradient(180deg, #006298 0%, #004f80 100%); color: white;">
+            <div class="rvt-container-lg">
+                <div class="section-header">
+                    <h2>Getting Started with REALLMS API</h2>
+                </div>
+                
+                <div class="rvt-row rvt-flow">
+                    <div class="rvt-cols-12 rvt-cols-8-lg">
+                        <div class="rvt-card rvt-card--raised" style="background: #243142; color: #e0e0e0; border: none;">
+                            <div class="rvt-card__body">
+                                <h3 class="rvt-card__title">API Access Process</h3>
+                                <p class="rvt-card__content">
+                                    Access to the REALLMS API is managed through the RT Projects system. Follow these steps to get started:
+                                </p>
+                                
+                                <div class="rvt-flow rvt-m-top-md">
+                                    <div class="api-process-step" data-step="1">
+                                        <h4>Create an RT Projects Account</h4>
+                                        <p>Visit <a href="https://projects.rt.iu.edu" style="color: var(--iu-gold);">https://projects.rt.iu.edu</a> and log in with your IU credentials.</p>
+                                    </div>
+                                    
+                                    <div class="api-process-step" data-step="2">
+                                        <h4>Create a Project</h4>
+                                        <p>Provide a brief description of your research or intended use. Students need to include their PI's username.</p>
+                                    </div>
+                                    
+                                    <div class="api-process-step" data-step="3">
+                                        <h4>Request REALLMS API Allocation</h4>
+                                        <p>From your project, request access to the REALLMS API resource.</p>
+                                    </div>
+                                    
+                                    <div class="api-process-step" data-step="4">
+                                        <h4>Create Your API Key</h4>
+                                        <p>Once approved, visit your allocation's page and generate an API key.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="rvt-m-top-lg">
+                                    <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024132" class="rvt-button rvt-button--primary" style="background: var(--iu-gold); color: #243142;">Detailed Instructions</a>
+                                    <a href="https://projects.rt.iu.edu/help/?queue=racs" class="rvt-button rvt-button--secondary" style="background: #4a5568; color: white;">Contact Support</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rvt-cols-12 rvt-cols-4-lg">
+                        <div class="rvt-card rvt-card--raised" style="background: #243142; color: #e0e0e0; border: none;">
+                            <div class="rvt-card__body">
+                                <h3 class="rvt-card__title">API Configuration</h3>
+                                <div class="rvt-card__content rvt-flow">
+                                    <p><strong>Base URL:</strong></p>
+                                    <div class="code-block">
+                                        https://reallms.rescloud.iu.edu/direct/v1
+                                    </div>
+                                    
+                                    <p><strong>Authentication:</strong></p>
+                                    <div class="code-block">
+                                        Authorization: Bearer &lt;API-KEY&gt;
+                                    </div>
+                                    
+                                    <p class="rvt-m-top-md">
+                                        <small>Note: Your API key is personal. Add collaborators to your project to share access.</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rvt-container-lg rvt-p-top-xxl">
+            <div class="section-header">
+                <h2>RT Projects to REALLMS API Allocation</h2>
+                <p class="rvt-flow">Visual overview of how RT Projects manages your REALLMS API access.</p>
+            </div>
+            
+            <div class="rvt-card rvt-card--raised">
+                <div class="rvt-card__body">
+                    <div class="flow-diagram">
+                        <div class="rvt-row rvt-flex rvt-flex-column rvt-flex-md-row rvt-items-center rvt-justify-center rvt-flow rvt-flow-md-none">
+                            <div class="rvt-flex rvt-items-center rvt-justify-center" style="min-width: 200px;">
+                                <div style="background: var(--iu-blue); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                                    <h4 style="margin: 0;">1. RT Projects</h4>
+                                    <p style="margin: 10px 0 0; opacity: 0.9;">Create project & request allocation</p>
+                                    <a href="https://projects.rt.iu.edu" style="color: var(--iu-gold);">projects.rt.iu.edu</a>
+                                </div>
+                            </div>
+                            
+                            <div class="flow-arrow">&rarr;</div>
+                            
+                            <div class="rvt-flex rvt-items-center rvt-justify-center" style="min-width: 200px;">
+                                <div style="background: var(--iu-gold); color: var(--iu-black); padding: 20px; border-radius: 12px; text-align: center;">
+                                    <h4 style="margin: 0;">2. Allocation Approved</h4>
+                                    <p style="margin: 10px 0 0;">UITS REALLMS team reviews</p>
+                                    <small style="opacity: 0.8;">2-3 business days</small>
+                                </div>
+                            </div>
+                            
+                            <div class="flow-arrow">&rarr;</div>
+                            
+                            <div class="rvt-flex rvt-items-center rvt-justify-center" style="min-width: 200px;">
+                                <div style="background: var(--iu-crimson); color: white; padding: 20px; border-radius: 12px; text-align: center;">
+                                    <h4 style="margin: 0;">3. REALLMS API</h4>
+                                    <p style="margin: 10px 0 0;">Generate API key & start coding</p>
+                                    <a href="https://reallms.rescloud.iu.edu" style="color: white;">reallms.rescloud.iu.edu</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rvt-m-top-xl">
+                        <h4>How It Works</h4>
+                        <p class="rvt-flow">
+                            RT Projects serves as the central hub for managing research resource access at Indiana University. When you request and are approved for a REALLMS API allocation through RT Projects, you gain the ability to generate API keys that provide authenticated access to the REALLMS infrastructure. This architecture ensures proper access control, usage tracking, and support coordination through the UITS Research Applications and Deep Learning (RADL) team.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="use-cases" class="rvt-p-top-xxl rvt-p-bottom-xxl" style="background: linear-gradient(180deg, #f5f7fa 0%, #e4e8ec 100%);">
+            <div class="rvt-container-lg">
+                <div class="section-header">
+                    <h2>Use Cases</h2>
+                </div>
+                
+                <div class="rvt-row rvt-flow">
+                    <div class="rvt-cols-12 rvt-cols-6-md">
+                        <div class="rvt-card rvt-card--raised feature-card">
+                            <div class="rvt-card__body">
+                                <div class="feature-icon">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="rvt-card__title">Chat Interface</h3>
+                                <p class="rvt-card__content">
+                                    Use the REALLMS Chat interface for interactive conversations with multiple LLMs. No separate account needed - just log in with your IU credentials.
+                                </p>
+                                <div class="rvt-card__content rvt-flow">
+                                    <ul class="rvt-list rvt-list--bulleted">
+                                        <li>Multiple models to choose from</li>
+                                        <li>Save and organize multiple chats</li>
+                                        <li>Upload documents for context</li>
+                                        <li>Generate images</li>
+                                        <li>Folder support with custom prompts</li>
+                                    </ul>
+                                </div>
+                                <div class="rvt-m-top-md">
+                                    <a href="https://reallms.rescloud.iu.edu" class="rvt-button rvt-button--primary">Try Chat</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rvt-cols-12 rvt-cols-6-md">
+                        <div class="rvt-card rvt-card--raised feature-card">
+                            <div class="rvt-card__body">
+                                <div class="feature-icon">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="rvt-card__title">API Integration</h3>
+                                <p class="rvt-card__content">
+                                    Integrate LLM capabilities directly into your research workflows, IDEs, and applications using the REALLMS API.
+                                </p>
+                                <div class="rvt-card__content rvt-flow">
+                                    <h4>Common Integration Patterns:</h4>
+                                    <ul class="rvt-list rvt-list--bulleted">
+                                        <li><strong>IDE Integration:</strong> Add AI assistance to VS Code, PyCharm, and other development environments</li>
+                                        <li><strong>Harness Systems:</strong> Automate code generation, testing, and documentation in CI/CD pipelines</li>
+                                        <li><strong>Research Workflows:</strong> Analyze documents, generate summaries, and extract insights</li>
+                                        <li><strong>Custom Applications:</strong> Build chatbots, tutoring systems, and data analysis tools</li>
+                                    </ul>
+                                </div>
+                                <div class="rvt-m-top-md">
+                                    <a href="#api" class="rvt-button rvt-button--primary">Get API Access</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rvt-m-top-xl">
+                    <div class="section-header">
+                        <h3>IDE & Harness Setup Examples</h3>
+                    </div>
+                    
+                    <div class="rvt-row rvt-flow">
+                        <div class="rvt-cols-12 rvt-cols-6-lg">
+                            <div class="rvt-card rvt-card--raised">
+                                <div class="rvt-card__body">
+                                    <h4 class="rvt-card__title">VS Code Integration</h4>
+                                    <p class="rvt-card__content">
+                                        Configure your VS Code environment with the REALLMS API for AI-assisted coding:
+                                    </p>
+                                    <div class="code-block rvt-m-top-md">
+                                        <span style="color: #569cd6;">export</span> <span style="color: #9cdcfe;">REALLMS_API_KEY</span>=<span style="color: #ce9178;">'your-api-key-here'</span><br>
+                                        <span style="color: #569cd6;">export</span> <span style="color: #9cdcfe;">REALLMS_API_URL</span>=<span style="color: #ce9178;">'https://reallms.rescloud.iu.edu/direct/v1'</span>
+                                    </div>
+                                    <p class="rvt-card__content rvt-m-top-md">
+                                        Then install extensions like GitHub Copilot or configure custom LLM integrations to use the REALLMS endpoints.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="rvt-cols-12 rvt-cols-6-lg">
+                            <div class="rvt-card rvt-card--raised">
+                                <div class="rvt-card__body">
+                                    <h4 class="rvt-card__title">Python Applications</h4>
+                                    <p class="rvt-card__content">
+                                        Use the requests library to integrate REALLMS API into your Python research scripts:
+                                    </p>
+                                    <div class="code-block rvt-m-top-md">
+                                        <span style="color: #569cd6;">import</span> requests<br>
+                                        <br>
+                                        <span style="color: #569cd6;">url</span> = <span style="color: #ce9178;">"https://reallms.rescloud.iu.edu/direct/v1/chat/completions"</span><br>
+                                        <span style="color: #569cd6;">headers</span> = {<br>
+                                        &nbsp;&nbsp;<span style="color: #ce9178;">'Authorization'</span>: <span style="color: #ce9178;">f'Bearer {API_KEY}'</span>,<br>
+                                        &nbsp;&nbsp;<span style="color: #ce9178;">'Content-Type'</span>: <span style="color: #ce9178;">'application/json'</span><br>
+                                        }<br>
+                                        <br>
+                                        <span style="color: #569cd6;">data</span> = {<br>
+                                        &nbsp;&nbsp;<span style="color: #ce9178;">"model"</span>: <span style="color: #ce9178;">"gemma-4-31B-it"</span>,<br>
+                                        &nbsp;&nbsp;<span style="color: #ce9178;">"messages"</span>: [<span style="color: #ce9178;">{"role": "user", "content": "Your prompt here"}</span>]<br>
+                                        }<br>
+                                        <br>
+                                        <span style="color: #569cd6;">response</span> = requests.post(url, headers=headers, json=data)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="codex-opencode" class="rvt-container-lg rvt-p-top-xxl">
+            <div class="section-header">
+                <h2>Using Codex & Opencode with REALLMS</h2>
+                <p class="rvt-flow">Specific documentation for integrating these AI coding assistants with the REALLMS API.</p>
+            </div>
+            
+            <div class="rvt-row rvt-flow">
+                <div class="rvt-cols-12 rvt-cols-6-lg">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="rvt-card__body">
+                            <span class="badge-new rvt-m-bottom-sm" style="background: var(--iu-blue);">For Codex</span>
+                            <h3 class="rvt-card__title">Codex Configuration</h3>
+                            <p class="rvt-card__content">
+                                To use Codex with the REALLMS API, configure your Codex settings to point to the REALLMS endpoint:
+                            </p>
+                            <div class="code-block rvt-m-top-md">
+                                <span style="color: #569cd6;">{
+                                </span><br>
+                                &nbsp;&nbsp;<span style="color: #9cdcfe;">"api_base"</span>: <span style="color: #ce9178;">"https://reallms.rescloud.iu.edu/direct/v1"</span>,<br>
+                                &nbsp;&nbsp;<span style="color: #9cdcfe;">"api_key"</span>: <span style="color: #ce9178;">"your-api-key"</span>,<br>
+                                &nbsp;&nbsp;<span style="color: #9cdcfe;">"engine"</span>: <span style="color: #ce9178;">"gemma-4-31B-it"</span><br>
+                                <span style="color: #569cd6;">}</span>
+                            </div>
+                            <p class="rvt-card__content rvt-m-top-md">
+                                Note: Replace <code>gemma-4-31B-it</code> with any available model from the REALLMS API.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rvt-cols-12 rvt-cols-6-lg">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="rvt-card__body">
+                            <span class="badge-new rvt-m-bottom-sm" style="background: var(--iu-crimson);">For Opencode</span>
+                            <h3 class="rvt-card__title">Opencode Setup</h3>
+                            <p class="rvt-card__content">
+                                Configure Opencode to use REALLMS as its LLM backend:
+                            </p>
+                            <div class="code-block rvt-m-top-md">
+                                <span style="color: #569cd6;">{
+                                </span><br>
+                                &nbsp;&nbsp;<span style="color: #9cdcfe;">"model"</span>: <span style="color: #ce9178;">"opencode"</span>,<br>
+                                &nbsp;&nbsp;<span style="color: #9cdcfe;">"provider"</span>: <span style="color: #ce9178;">"openai"</span>,<br>
+                                &nbsp;&nbsp;<span style="color: #9cdcfe;">"base_url"</span>: <span style="color: #ce9178;">"https://reallms.rescloud.iu.edu/direct/v1"</span>,<br>
+                                &nbsp;&nbsp;<span style="color: #9cdcfe;">"api_key"</span>: <span style="color: #ce9178;">"your-api-key"</span><br>
+                                <span style="color: #569cd6;">}</span>
+                            </div>
+                            <p class="rvt-card__content rvt-m-top-md">
+                                Opencode will now route all AI requests through the REALLMS infrastructure, giving you access to all available models.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rvt-m-top-xl rvt-card rvt-card--raised">
+                <div class="rvt-card__body">
+                    <h4 class="rvt-card__title">API Endpoints Available</h4>
+                    <p class="rvt-card__content">
+                        The REALLMS API supports multiple endpoints for different use cases:
+                    </p>
+                    <div class="rvt-flow rvt-m-top-md">
+                        <div class="api-endpoint">
+                            <strong><code>/models</code></strong>
+                            <p>Get list of all available models</p>
+                            <div class="code-block rvt-m-top-sm">
+                                curl -X GET https://reallms.rescloud.iu.edu/direct/v1/models -H "Authorization: Bearer &lt;API-KEY&gt;"
+                            </div>
+                        </div>
+                        
+                        <div class="api-endpoint">
+                            <strong><code>/chat/completions</code></strong>
+                            <p>Send chat messages to models (supports gemma-4-31B-it, glm-5.2, gpt-oss-120b, Qwen3-Coder-Next)</p>
+                            <div class="code-block rvt-m-top-sm">
+                                curl -X POST https://reallms.rescloud.iu.edu/direct/v1/chat/completions \<br>
+                                &nbsp;&nbsp;--header 'Authorization: Bearer &lt;API-KEY&gt;' \<br>
+                                &nbsp;&nbsp;--header 'Content-Type: application/json' \<br>
+                                &nbsp;&nbsp;--data '{"model": "gemma-4-31B-it", "messages": [{"role": "user", "content": "Hello"}]}'
+                            </div>
+                        </div>
+                        
+                        <div class="api-endpoint">
+                            <strong><code>/completions</code></strong>
+                            <p>Get text completions (supports the same models as chat/completions)</p>
+                        </div>
+                        
+                        <div class="api-endpoint">
+                            <strong><code>/embeddings</code></strong>
+                            <p>Generate embeddings (supports Qwen3-Embedding-8B, embeddinggemma-300m)</p>
+                        </div>
+                        
+                        <div class="api-endpoint">
+                            <strong><code>/rerank</code></strong>
+                            <p>Rerank search results (supports Qwen3-Reranker-8B)</p>
+                        </div>
+                    </div>
+                    <p class="rvt-m-top-md">
+                        For more examples and detailed API documentation, see the <a href="https://github.iu.edu/ResearchApplicationsDeepLearning/REALLMS-API-examples" style="color: var(--iu-blue);">REALLMS API examples repository</a>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="stats" class="rvt-p-top-xxl rvt-p-bottom-xxl" style="background: linear-gradient(135deg, #006298 0%, #004f80 100%);">
+            <div class="rvt-container-lg">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">4+</div>
+                        <div class="stat-label">LLM Models</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">256K</div>
+                        <div class="stat-label">Context Length</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">On-Premise</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">Free</div>
+                        <div class="stat-label">For IU Community</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rvt-container-lg rvt-p-top-xxl">
+            <div class="section-header">
+                <h2>Get Started Today</h2>
+            </div>
+            
+            <div class="rvt-row rvt-flow">
+                <div class="rvt-cols-12 rvt-cols-6-lg">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="rvt-card__body">
+                            <h3 class="rvt-card__title">Start Chatting</h3>
+                            <p class="rvt-card__content">
+                                Ready to try the REALLMS Chat interface? No application needed - just log in with your IU credentials.
+                            </p>
+                            <a href="https://reallms.rescloud.iu.edu" class="rvt-button rvt-button--primary cta-button">Access REALLMS Chat</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="rvt-cols-12 rvt-cols-6-lg">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="rvt-card__body">
+                            <h3 class="rvt-card__title">Get API Access</h3>
+                            <p class="rvt-card__content">
+                                Need programmatic access? Apply for an RT Projects account and REALLMS API allocation.
+                            </p>
+                            <a href="https://projects.rt.iu.edu" class="rvt-button rvt-button--primary cta-button" style="background: var(--iu-crimson); color: white;">Apply for API Access</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rvt-m-top-xl rvt-card rvt-card--raised">
+                <div class="rvt-card__body">
+                    <h3 class="rvt-card__title">Need Help?</h3>
+                    <p class="rvt-card__content">
+                        For questions about using REALLMS Chat or the REALLMS API, contact the UITS REALLMS team through RT Projects:
+                    </p>
+                    <div class="rvt-m-top-md">
+                        <a href="https://projects.rt.iu.edu/help/?queue=racs" class="rvt-button rvt-button--secondary" style="background: var(--iu-blue); color: white;">Contact Support</a>
+                        <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0026671" class="rvt-button rvt-button--plain">View Documentation</a>
+                    </div>
+                    <p class="rvt-card__content rvt-m-top-md">
+                        You can also join the <a href="https://servicenow.iu.edu/kb?id=kb_article_view&sysparm_article=KB0024086" style="color: var(--iu-blue);">IU HPC and AI User Community Slack</a> and join the <code>#reallms</code> channel to connect with other researchers and the REALLMS team.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="rvt-footer" role="contentinfo">
+        <div class="rvt-container-lg">
+            <div class="rvt-footer__top">
+                <div class="rvt-footer__branding">
+                    <a href="https://www.iu.edu" class="rvt-footer__logo">
+                        <svg aria-hidden="true" width="40" height="40" viewBox="0 0 40 40" fill="currentColor">
+                            <path d="M20 0C8.954 0 0 8.954 0 20s8.954 20 20 20 20-8.954 20-20S31.046 0 20 0zm0 36c-8.837 0-16-7.163-16-16S11.163 4 20 4s16 7.163 16 16-7.163 16-16 16z"/>
+                            <path d="M28 12h-4v4h-4v-4h-4v4h-4v4h4v4h4v-4h4v-4h4v-4z"/>
+                            <path d="M12 20h4v4h-4v-4zm0 8h4v4h-4v-4z"/>
+                        </svg>
+                    </a>
+                    <p class="rvt-footer__tagline">Indiana University</p>
+                </div>
+                <div class="rvt-footer__nav">
+                    <a href="https://www.iu.edu/about/index.shtml" class="rvt-footer__nav-link">About IU</a>
+                    <a href="https://www.iu.edu/contact/" class="rvt-footer__nav-link">Contact IU</a>
+                    <a href="https://privacy.iu.edu/" class="rvt-footer__nav-link">Privacy Notice</a>
+                    <a href="https://www.iu.edu/accessibility/" class="rvt-footer__nav-link">Accessibility</a>
+                </div>
+            </div>
+            <div class="rvt-footer__bottom">
+                <p class="rvt-footer__copyright">
+                    &copy; <span id="current-year">2026</span> The Trustees of Indiana University
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

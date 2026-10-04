@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REALLMS - Research and Academic LLM Services</title>
+    <link rel="stylesheet" href="https://rivet.iu.edu/css/styles.css">
+    <style>
+        :root {
+            --iu-gold: #FDB912;
+            --iu-black: #1A1A1A;
+            --iu-sky: #83C0F5;
+        }
+        
+        .rvt-hero--reallms {
+            background: linear-gradient(135deg, var(--iu-black) 0%, #2d2d2d 100%);
+            color: white;
+            padding: 8rem 0 6rem;
+        }
+        
+        .rvt-hero--reallms .rvt-hero__title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .rvt-hero--reallms .rvt-hero__teaser p {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+        
+        .rvt-hero__actions .rvt-cta {
+            margin-right: 1rem;
+        }
+        .rvt-card {
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .rvt-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        
+        .workflow-diagram {
+            background: var(--iu-gold-000);
+            padding: 4rem 0;
+        }
+        
+        .workflow-step {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .workflow-step-number {
+            width: 100px;
+            height: 100px;
+            background: var(--iu-black);
+            color: var(--iu-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 25px rgba(251, 185, 18, 0.3);
+        }
+        
+        .workflow-step h3 {
+            margin-bottom: 1rem;
+            color: var(--iu-black);
+        }
+        
+        .workflow-step p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .workflow-arrow {
+            font-size: 3rem;
+            color: var(--iu-sky);
+            margin: 2rem 0;
+        }
+        
+        .model-table {
+            margin-top: 2rem;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .stat-card .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--iu-black);
+            display: block;
+        }
+        
+        .stat-card .stat-label {
+            font-size: 1rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+            display: block;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--iu-sky);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: var(--iu-black);
+        }
+        
+        .footer-custom {
+            background: var(--iu-black);
+            color: #ccc;
+            padding: 3rem 0 1.5rem;
+        }
+        
+        .footer-custom a {
+            color: white;
+        }
+        
+        .footer-custom a:hover {
+            color: var(--iu-gold);
+        }
+        
+        .highlight-box {
+            background: var(--iu-sky);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .highlight-box h3 {
+            color: var(--iu-black);
+            margin-bottom: 1rem;
+        }
+        
+        .highlight-box a {
+            color: var(--iu-black);
+            font-weight: 600;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--iu-gold);
+            color: var(--iu-black);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .rvt-hero--reallms .rvt-hero__title {
+                font-size: 2.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="rvt-header rvt-header--expanded rvt-shadow">
+        <div class="rvt-container-lg">
+            <div class="rvt-header__inner">
+                <a href="https://www.iu.edu" class="rvt-logo">
+                    <svg class="rvt-logo__image" width="40" height="40" viewBox="0 0 28 34">
+                        <path d="M-3.34344e-05 4.70897H8.83308V7.174H7.1897V21.1426H10.6134V2.72321H8.83308V0.121224H18.214V2.65476H16.2283V21.1426H19.7889V7.174H18.214V4.64047H27.0471V7.174H25.0614V23.6761L21.7746 26.8944H16.2967V30.455H18.214V33.8787H8.76463V30.592H10.6819V26.8259H5.20403L1.91726 23.6077V7.174H-3.34344e-05V4.70897Z" fill="#1A1A1A"/>
+                    </svg>
+                </a>
+                <nav class="rvt-nav">
+                    <ul class="rvt-list rvt-nav__list rvt-list--inline">
+                        <li><a href="#chat">Chat</a></li>
+                        <li><a href="#api">API</a></li>
+                        <li><a href="#models">Models</a></li>
+                        <li><a href="#docs">Documentation</a></li>
+                    </ul>
+                </nav>
+                <button class="rvt-menu-toggle" aria-label="Toggle navigation">
+                    <span class="rvt-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="rvt-hero rvt-hero--reallms rvt-shadow-heavy">
+            <div class="rvt-container-lg">
+                <div class="rvt-hero__inner">
+                    <div class="rvt-hero__body rvt-flow">
+                        <span class="rvt-hero__eyebrow">Research and Academic LLM Services</span>
+                        <h1 class="rvt-hero__title">Empowering Research with Advanced AI Capabilities</h1>
+                        <div class="rvt-hero__teaser">
+                            <p>Access state-of-the-art Large Language Models through REALLMS – enabling cutting-edge research, academic projects, and innovative applications across Indiana University.</p>
+                        </div>
+                        <div class="rvt-hero__actions">
+                            <a href="https://reallms.rescloud.iu.edu" class="rvt-cta rvt-cta--button rvt-cta--primary rvt-shadow">Try REALLMS Chat</a>
+                            <a href="#api" class="rvt-cta rvt-cta--button rvt-cta--secondary rvt-shadow">Explore API</a>
+                        </div>
+                    </div>
+                    <div class="rvt-hero__media">
+                        <svg width="300" height="300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="#FDB912" stroke-width="2"/>
+                            <path d="M12 6V18" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M8 10L12 6L16 10" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 14L12 18L16 14" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 12H18" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rvt-container-lg rvt-m-top-xl rvt-m-bottom-xl">
+            <div class="rvt-row rvt-row--gutted">
+                <div class="rvt-cols-6-md">
+                    <div class="rvt-card rvt-card--raised rvt-border-left-lg rvt-border-left-gold">
+                        <div class="rvt-card__body">
+                            <span class="rvt-badge rvt-font-bold">Featured Service</span>
+                            <h3 class="rvt-card__title">REALLMS Chat</h3>
+                            <p class="rvt-card__content">Interactive AI chat interface powered by GPT-4, Claude 3, Mistral, and Llama 3 models. Perfect for brainstorming, writing assistance, and quick research queries.</p>
+                            <a href="https://reallms.rescloud.iu.edu" class="rvt-cta rvt-cta--button rvt-cta--primary">Access REALLMS Chat</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="rvt-cols-6-md">
+                    <div class="rvt-card rvt-card--raised rvt-border-left-lg rvt-border-left-blue">
+                        <div class="rvt-card__body">
+                            <span class="rvt-badge rvt-bg-blue-500 rvt-color-white rvt-font-bold">For Developers</span>
+                            <h3 class="rvt-card__title">REALLMS API</h3>
+                            <p class="rvt-card__content">Programmatic access to advanced LLM capabilities through RESTful API. Perfect for integrating AI into your research workflows, automation, and custom applications.</p>
+                            <a href="#api" class="rvt-cta rvt-cta--button rvt-cta--secondary">View API Documentation</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="api" class="rvt-container-lg rvt-m-bottom-xl">
+            <div class="rvt-flow rvt-m-bottom-xl">
+                <h2 style="text-align: center; margin-bottom: 0.5rem;">AI-Powered Research Workflow</h2>
+                <p style="text-align: center; color: #666;">How to get started with REALLMS API through RT Projects</p>
+            </div>
+            
+            <div class="workflow-diagram">
+                <div class="rvt-container">
+                    <div class="rvt-row rvt-row--gutted rvt-flow">
+                        <div class="rvt-cols-3 rvt-cols-12-sm">
+                            <div class="workflow-step">
+                                <div class="workflow-step-number">1</div>
+                                <h3>RT Projects</h3>
+                                <p>Create your project at <a href="https://projects.rt.iu.edu">projects.rt.iu.edu</a> and request LLM API allocation.</p>
+                            </div>
+                        </div>
+                        <div class="rvt-cols-12 rvt-cols-3-sm">
+                            <div class="workflow-arrow">→</div>
+                        </div>
+                        <div class="rvt-cols-3 rvt-cols-12-sm">
+                            <div class="workflow-step">
+                                <div class="workflow-step-number">2</div>
+                                <h3>Allocated</h3>
+                                <p>Once approved, your project receives API access credentials and quota allocation.</p>
+                            </div>
+                        </div>
+                        <div class="rvt-cols-12 rvt-cols-3-sm">
+                            <div class="workflow-arrow">→</div>
+                        </div>
+                        <div class="rvt-cols-3 rvt-cols-12-sm">
+                            <div class="workflow-step">
+                                <div class="workflow-step-number">3</div>
+                                <h3>REALLMS API</h3>
+                                <p>Use your credentials to make API calls to <code>reallms.rescloud.iu.edu</code> and integrate AI into your workflows.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rvt-container-lg rvt-m-bottom-xl">
+            <h2 style="text-align: center; margin-bottom: 2rem;">IDE & Agent Integration</h2>
+            <div class="rvt-row rvt-row--gutted">
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="feature-icon">VS</div>
+                        <h3>VS Code</h3>
+                        <p>Seamless integration with VS Code through official extension for code generation, debugging, and AI-assisted development.</p>
+                        <a href="#" class="rvt-cta">Install Extension</a>
+                    </div>
+                </div>
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="feature-icon"> JetBrains</div>
+                        <h3>JetBrains</h3>
+                        <p>Native support for all JetBrains IDEs (PyCharm, WebStorm, IntelliJ) with contextual AI assistance.</p>
+                        <a href="#" class="rvt-cta">View Documentation</a>
+                    </div>
+                </div>
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="feature-icon">🤖</div>
+                        <h3>LLM Agents</h3>
+                        <p>Deploy autonomous AI agents for repetitive research tasks, data analysis, and automated workflows.</p>
+                        <a href="#" class="rvt-cta">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="models" class="rvt-container-lg rvt-m-bottom-xl">
+            <h2 style="text-align: center; margin-bottom: 1rem;">Available Models</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 2rem;">Access multiple state-of-the-art language models through a single API endpoint</p>
+            
+            <div class="rvt-table-responsive">
+                <table class="rvt-table rvt-table-compact">
+                    <thead>
+                        <tr>
+                            <th scope="col">Model</th>
+                            <th scope="col">Provider</th>
+                            <th scope="col">Best For</th>
+                            <th scope="col">Context Window</th>
+                            <th scope="col">Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">GPT-4o</th>
+                            <td>OpenAI</td>
+                            <td>General purpose, coding, multimodal</td>
+                            <td>128K tokens</td>
+                            <td><span class="rvt-badge rvt-bg-gold">Available</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">GPT-4 Turbo</th>
+                            <td>OpenAI</td>
+                            <td>Coding, complex reasoning</td>
+                            <td>128K tokens</td>
+                            <td><span class="rvt-badge rvt-bg-gold">Available</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Claude 3.5 Sonnet</th>
+                            <td>Anthropic</td>
+                            <td>Writing, analysis, coding</td>
+                            <td>200K tokens</td>
+                            <td><span class="rvt-badge rvt-bg-gold">Available</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Claude 3 Opus</th>
+                            <td>Anthropic</td>
+                            <td>Complex tasks, creative writing</td>
+                            <td>200K tokens</td>
+                            <td><span class="rvt-badge rvt-bg-gold">Available</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Mistral Large</th>
+                            <td>Mistral AI</td>
+                            <td>European languages, reasoning</td>
+                            <td>128K tokens</td>
+                            <td><span class="rvt-badge rvt-bg-gold">Available</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Llama 3.1 70B</th>
+                            <td>Meta</td>
+                            <td>Open source, customization</td>
+                            <td>128K tokens</td>
+                            <td><span class="rvt-badge rvt-bg-gold">Available</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Llama 3.1 405B</th>
+                            <td>Meta</td>
+                            <td>Large context, advanced reasoning</td>
+                            <td>128K tokens</td>
+                            <td><span class="rvt-badge rvt-bg-gold">Available</span></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Embeddings</th>
+                            <td>Mixed</td>
+                            <td>Vector search, NLP</td>
+                            <td>Variable</td>
+                            <td><span class="rvt-badge rvt-bg-gold">Available</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="sdk" class="rvt-container-lg rvt-m-bottom-xl">
+            <h2 style="text-align: center; margin-bottom: 2rem;">SDK & Libraries</h2>
+            <div class="rvt-row rvt-row--gutted">
+                <div class="rvt-cols-6 rvt-cols-12-sm">
+                    <div class="rvt-card rvt-card--horizontal rvt-card--raised">
+                        <div class="feature-icon" style="background: #3776AB; color: white;">🐍</div>
+                        <div class="rvt-card__body">
+                            <h3 class="rvt-card__title"><a href="#">Python SDK</a></h3>
+                            <p class="rvt-card__content">Official Python library for seamless REALLMS API integration. Supports async, streaming, and error handling.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rvt-cols-6 rvt-cols-12-sm">
+                    <div class="rvt-card rvt-card--horizontal rvt-card--raised">
+                        <div class="feature-icon" style="background: #F7DF1E; color: black;">📦</div>
+                        <div class="rvt-card__body">
+                            <h3 class="rvt-card__title"><a href="#">Node.js SDK</a></h3>
+                            <p class="rvt-card__content">TypeScript-compatible JavaScript library with comprehensive documentation and examples.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rvt-billboard rvt-m-top-xl">
+                <div class="rvt-billboard__image">
+                    <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#83C0F5" stroke-width="1">
+                        <path d="M2 12L12 2L22 12L12 22L2 12Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </div>
+                <div class="rvt-billboard__body">
+                    <h2 class="rvt-billboard__title">Quick Start Examples</h2>
+                    <div class="rvt-billboard__content rvt-flow">
+                        <h4>Python:</h4>
+                        <pre style="background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+import reallms
+
+client = reallms.Client(api_key="YOUR_KEY")
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+                        </pre>
+                        <h4>Node.js:</h4>
+                        <pre style="background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+import { REALLMS } from '@iu/reallms';
+
+const client = new REALLMS('YOUR_KEY');
+const response = await client.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [{role: 'user', content: 'Hello!'}]
+});
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rvt-container-lg rvt-m-bottom-xl">
+            <h2 style="text-align: center; margin-bottom: 1rem;">REALLMS Statistics</h2>
+            <div class="rvt-stat-group rvt-m-top-xl">
+                <a href="#" class="rvt-stat">
+                    <div class="rvt-stat__content rvt-flow">
+                        <div class="rvt-stat__number">1,500+</div>
+                        <div class="rvt-stat__description">Active Researchers</div>
+                    </div>
+                </a>
+                <a href="#" class="rvt-stat">
+                    <div class="rvt-stat__content rvt-flow">
+                        <div class="rvt-stat__number">8</div>
+                        <div class="rvt-stat__description">Available Models</div>
+                    </div>
+                </a>
+                <a href="#" class="rvt-stat">
+                    <div class="rvt-stat__content rvt-flow">
+                        <div class="rvt-stat__number">99.9%</div>
+                        <div class="rvt-stat__description">Uptime</div>
+                    </div>
+                </a>
+                <a href="#" class="rvt-stat">
+                    <div class="rvt-stat__content rvt-flow">
+                        <div class="rvt-stat__number">Free</div>
+                        <div class="rvt-stat__description">For Academic Use</div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section id="docs" class="rvt-container-lg rvt-m-bottom-xl">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Documentation & Resources</h2>
+            <div class="rvt-row rvt-row--gutted">
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="rvt-card__body">
+                            <span class="rvt-card__eyebrow">Documentation</span>
+                            <h3 class="rvt-card__title"><a href="https://kb.iu.edu/display/KMOLD/KB0027272">REALLMS API (KB0027272)</a></h3>
+                            <p class="rvt-card__content">Complete API documentation, authentication, available endpoints, and code examples.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="rvt-card__body">
+                            <span class="rvt-card__eyebrow">Guide</span>
+                            <h3 class="rvt-card__title"><a href="https://kb.iu.edu/display/KMOLD/KB0024132">RT Projects Guide (KB0024132)</a></h3>
+                            <p class="rvt-card__content">Step-by-step guide to setting up projects and allocating API resources.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <div class="rvt-card rvt-card--raised">
+                        <div class="rvt-card__body">
+                            <span class="rvt-card__eyebrow">Overview</span>
+                            <h3 class="rvt-card__title"><a href="https://kb.iu.edu/display/KMOLD/KB0026671">REALLMS Overview (KB0026671)</a></h3>
+                            <p class="rvt-card__content">Introduction to REALLMS services, use cases, and best practices.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rvt-container-lg">
+            <div class="rvt-billboard rvt-billboard--center">
+                <h2 class="rvt-billboard__title">Ready to start your research with AI?</h2>
+                <div class="rvt-billboard__content rvt-flow">
+                    <p>Get started with REALLMS today and unlock the power of advanced language models for your research projects.</p>
+                    <a href="https://reallms.rescloud.iu.edu" class="rvt-cta rvt-cta--button rvt-cta--primary">Try REALLMS Chat</a>
+                    <a href="https://projects.rt.iu.edu" class="rvt-cta rvt-cta--button rvt-cta--secondary">Setup API Access</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="rvt-footer footer-custom">
+        <div class="rvt-container-lg">
+            <div class="rvt-row rvt-row--gutted rvt-m-bottom-lg">
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <h4 style="color: white; margin-bottom: 1rem;">REALLMS</h4>
+                    <p>Research and Academic LLM Services at Indiana University. Providing access to advanced AI models for research, teaching, and learning.</p>
+                </div>
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <h4 style="color: white; margin-bottom: 1rem;">Resources</h4>
+                    <ul class="rvt-list rvt-flow">
+                        <li><a href="#chat">REALLMS Chat</a></li>
+                        <li><a href="#api">API Documentation</a></li>
+                        <li><a href="#models">Available Models</a></li>
+                        <li><a href="https://projects.rt.iu.edu">RT Projects</a></li>
+                    </ul>
+                </div>
+                <div class="rvt-cols-4 rvt-cols-12-sm">
+                    <h4 style="color: white; margin-bottom: 1rem;">Contact & Support</h4>
+                    <ul class="rvt-list rvt-flow">
+                        <li><a href="https://kb.iu.edu/display/KMOLD/KB0027272">KB0027272 - API Docs</a></li>
+                        <li><a href="https://kb.iu.edu/display/KMOLD/KB0024132">KB0024132 - RT Guide</a></li>
+                        <li><a href="https://kb.iu.edu/display/KMOLD/KB0026671">KB0026671 - Overview</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="rvt-row rvt-row--gutted" style="border-top: 1px solid #333; padding-top: 1.5rem;">
+                <div class="rvt-cols-6 rvt-cols-12-sm">
+                    <p>&copy; 2026 The Trustees of Indiana University</p>
+                </div>
+                <div class="rvt-cols-6 rvt-cols-12-sm" style="text-align: right;">
+                    <p>Powered by Research Technologies</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
