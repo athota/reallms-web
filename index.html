@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Evaluation Index</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --accent-color: #0366d6;
+            --border-color: #d1d5da;
+            --hover-color: #f1f8ff;
+            --date-bg: #e1e4e8;
+            --date-text: #586069;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #24292e;
+            margin-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background-color: var(--hover-color);
+            border-color: var(--accent-color);
+        }
+
+        .date-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--date-bg);
+            color: var(--date-text);
+            padding: 2px 8px;
+            border-radius: 12px;
+            width: fit-content;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--accent-color);
+        }
+
+        .card-filename {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.85rem;
+            color: #586069;
+            word-break: break-all;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #6a737d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Model Evaluation Reports</h1>
+            <p>Reports listed in reverse chronological order (Newest to Oldest).</p>
+        </header>
+
+        <div class="grid">
+            <!-- Oct 01, 2026 -->
+            <a href="claude-design-100126.html" class="card">
+                <div class="date-badge">Oct 01, 2026</div>
+                <div class="card-title">Claude Design</div>
+                <div class="card-filename">claude-design-100126.html</div>
+            </a>
+
+            <!-- Sept 29, 2026 -->
+            <a href="gpt-6-astra-092926.html" class="card">
+                <div class="date-badge">Sept 29, 2026</div>
+                <div class="card-title">GPT-6 Astra</div>
+                <div class="card-filename">gpt-6-astra-092926.html</div>
+            </a>
+
+            <!-- Sept 24, 2026 -->
+            <a href="glm-5.3-nvfp4-092426.html" class="card">
+                <div class="date-badge">Sept 24, 2026</div>
+                <div class="card-title">GLM 5.3 NVFP4</div>
+                <div class="card-filename">glm-5.3-nvfp4-092426.html</div>
+            </a>
+
+            <!-- Sept 19, 2026 -->
+            <a href="qwen3.8-27b-091926.html" class="card">
+                <div class="date-badge">Sept 19, 2026</div>
+                <div class="card-title">Qwen 3.8 27B</div>
+                <div class="card-filename">qwen3.8-27b-091926.html</div>
+            </a>
+            <a href="qwen3.8-flash-next-091926.html" class="card">
+                <div class="date-badge">Sept 19, 2026</div>
+                <div class="card-title">Qwen 3.8 Flash Next</div>
+                <div class="card-filename">qwen3.8-flash-next-091926.html</div>
+            </a>
+            <a href="qwen3-coder-next-fp8-2-091926.html" class="card">
+                <div class="date-badge">Sept 19, 2026</div>
+                <div class="card-title">Qwen3 Coder Next FP8-2</div>
+                <div class="card-filename">qwen3-coder-next-fp8-2-091926.html</div>
+            </a>
+
+            <!-- June 21, 2026 -->
+            <a href="glm-5.2-062126.html" class="card">
+                <div class="date-badge">June 21, 2026</div>
+                <div class="card-title">GLM 5.2</div>
+                <div class="card-filename">glm-5.2-062126.html</div>
+            </a>
+
+            <!-- May 31, 2026 -->
+            <a href="kimi-k2.6-053126.html" class="card">
+                <div class="date-badge">May 31, 2026</div>
+                <div class="card-title">Kimi k2.6</div>
+                <div class="card-filename">kimi-k2.6-053126.html</div>
+            </a>
+
+            <!-- May 27, 2026 -->
+            <a href="qwen3-coder-next-fp16-js2-1-052726.html" class="card">
+                <div class="date-badge">May 27, 2026</div>
+                <div class="card-title">Qwen3 Coder Next FP16 JS2-1</div>
+                <div class="card-filename">qwen3-coder-next-fp16-js2-1-052726.html</div>
+            </a>
+            <a href="qwen3-coder-next-fp16-js2-2-052726.html" class="card">
+                <div class="date-badge">May 27, 2026</div>
+                <div class="card-title">Qwen3 Coder Next FP16 JS2-2</div>
+                <div class="card-filename">qwen3-coder-next-fp16-js2-2-052726.html</div>
+            </a>
+
+            <!-- May 17, 2026 -->
+            <a href="kimi-k2.6-051726.html" class="card">
+                <div class="date-badge">May 17, 2026</div>
+                <div class="card-title">Kimi k2.6</div>
+                <div class="card-filename">kimi-k2.6-051726.html</div>
+            </a>
+
+            <!-- May 10, 2026 -->
+            <a href="claude-opus-4.7-051026.html" class="card">
+                <div class="date-badge">May 10, 2026</div>
+                <div class="card-title">Claude Opus 4.7</div>
+                <div class="card-filename">claude-opus-4.7-051026.html</div>
+            </a>
+            <a href="gemma4-31b-it-051026.html" class="card">
+                <div class="date-badge">May 10, 2026</div>
+                <div class="card-title">Gemma 4 31B IT</div>
+                <div class="card-filename">gemma4-31b-it-051026.html</div>
+            </a>
+            <a href="qwen3-coder-next-fp8-051026.html" class="card">
+                <div class="date-badge">May 10, 2026</div>
+                <div class="card-title">Qwen3 Coder Next FP8</div>
+                <div class="card-filename">qwen3-coder-next-fp8-051026.html</div>
+            </a>
+        </div>
+
+        <footer>
+            <p>Generated for GitHub Pages Deployment &bull; Sorted Newest to Oldest</p>
+        </footer>
+    </div>
+
+</body>
+</html>
